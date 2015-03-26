@@ -3,47 +3,128 @@ function Reflector(type, col, row) {
 	this.type = type;
 	this.col = col;
 	this.row = row;
+	this.startX = this.col*config.blockSize;
+	this.startY = this.row*config.blockSize;
 }
 
 Reflector.prototype.draw = function(context) {
 
-	var startX = this.col*config.blockSize;
-	var startY = this.row*config.blockSize;
 	context.strokeStyle = '#000000';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
-	console.log(this.type);
 	switch(this.type) {
 
 		case 1:
-			context.moveTo(startX, startY);
-			context.lineTo(startX, startY+config.blockSize);
-			context.lineTo(startX+config.blockSize, startY);
-			context.lineTo(startX, startY);
+			context.moveTo(this.startX, this.startY);
+			context.lineTo(this.startX, this.startY+config.blockSize);
+			context.lineTo(this.startX+config.blockSize, this.startY);
+			context.lineTo(this.startX, this.startY);
 			break;
 
 		case 2:
-			context.moveTo(startX, startY);
-			context.lineTo(startX, startY+config.blockSize);
-			context.lineTo(startX+config.blockSize, startY+config.blockSize);
-			context.lineTo(startX, startY);
+			context.moveTo(this.startX, this.startY);
+			context.lineTo(this.startX, this.startY+config.blockSize);
+			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
+			context.lineTo(this.startX, this.startY);
 			break;
 
 		case 3:
-			context.moveTo(startX, startY+config.blockSize);
-			context.lineTo(startX+config.blockSize, startY+config.blockSize);
-			context.lineTo(startX+config.blockSize, startY);
-			context.lineTo(startX, startY+config.blockSize);
+			context.moveTo(this.startX, this.startY+config.blockSize);
+			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
+			context.lineTo(this.startX+config.blockSize, this.startY);
+			context.lineTo(this.startX, this.startY+config.blockSize);
 			break;
 
 		case 4:
-			context.moveTo(startX+config.blockSize, startY+config.blockSize);
-			context.lineTo(startX+config.blockSize, startY);
-			context.lineTo(startX, startY);
-			context.lineTo(startX+config.blockSize, startY+config.blockSize);
+			context.moveTo(this.startX+config.blockSize, this.startY+config.blockSize);
+			context.lineTo(this.startX+config.blockSize, this.startY);
+			context.lineTo(this.startX, this.startY);
+			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
 			break;
 	}
 	context.stroke();
+}
+
+Reflector.prototype.collidesWithLine = function(line) {
+
+	var middleX = this.startX+(config.blockSize/2); 
+	var middleY = this.startY+(config.blockSize/2); 
+	var endX = this.startX+config.blockSize; 
+	var endY = this.startY+config.blockSize; 
+	return (
+	(
+		(line.type == 1)
+		&& (this.startY < line.startY && line.startY < endY)
+		&& (
+			(
+				(this.type > 2) 
+				&& (
+					(line.startX <= middleX && middleX <= line.endX) 
+					|| (line.startX >= middleX && middleX >= line.endX) 
+				)
+			) || (
+				(this.type < 3)
+				&& (
+					(line.startX <= this.startX && this.startX <= line.endX) 
+					|| (line.startX >= this.startX && this.startX >= line.endX) 
+				)
+			)
+		)
+	) || (
+		(line.type == 2) 
+		&& (this.startX < line.startX && line.startX < endX)
+		&& (
+			(
+				(this.type > 1 && this.type < 4) 
+				&& (
+					(line.startY <= middleY && middleY <= line.endY) 
+					|| (line.startY >= middleY && middleY >= line.endY) 
+				)
+			) || (
+				(this.type < 2 || this.type > 3)
+				&& (
+					(line.startY <= this.startY && this.startY <= line.endY) 
+					|| (line.startY >= this.startY && this.startY >= line.endY) 
+				)
+			)
+		)
+	) || (
+		(line.type == 3) 
+		&& (this.startY < line.startY && line.startY < endY)
+		&& (
+			(
+				(this.type < 3)
+				&& (
+					(line.startX <= middleX && middleX <= line.endX) 
+					|| (line.startX >= middleX && middleX >= line.endX)
+				)
+			) || (
+				(this.type > 3)
+				&& (
+					(line.startX <= endX && endX <= line.endX) 
+					|| (line.startX >= endX && endX >= line.endX) 
+				)
+			)
+		)
+	) || (
+		(line.type == 4) 
+		&& (this.startX < line.startX && line.startX < endX)
+		&& (
+			(
+				(this.type < 2 || this.type > 3) 
+				&& (
+					(line.startY <= middleY && middleY <= line.endY) 
+					|| (line.startY >= middleY && middleY >= line.endY) 
+				)
+			) || (
+				(this.type > 1 && this.type < 4)
+				&& (
+					(line.startY <= endY && endY <= line.endY) 
+					|| (line.startY >= endY && endY >= line.endY)
+				)
+			)
+		)
+	));
 }
 
 Reflector.prototype.rotateLeft = function() {

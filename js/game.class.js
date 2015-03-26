@@ -31,7 +31,7 @@ Game.prototype.init = function() {
 	this.addWall(2, 8, 0, 8);
 	this.addWall(1, 0, 8, 8);
 	this.addWall(2, 0, 0, 8);
-	this.addLine(1, (config.blockSize)+(config.blockSize/2), (config.blockSize)+(config.blockSize/2), config.blockSize);
+	this.addLine(1, (0*config.blockSize)+(config.blockSize/2), (2*config.blockSize)+(config.blockSize/2), config.blockSize);
 	this.draw();
 	this.startControls();
 }
@@ -59,6 +59,22 @@ Game.prototype.startControls = function() {
 	})
 }
 
+Game.prototype.checkCollisions = function() {
+
+	for (var i = 0; i < this.tiles.lines.length; i++) {
+
+		var line = this.tiles.lines[i];
+		for (var j = 0; j < this.tiles.reflectors.length; j++) {
+
+			var reflector = this.tiles.reflectors[j];
+			if (reflector.collidesWithLine(line)) {
+
+				console.log(reflector.type);
+			}
+		}
+	}
+}
+
 Game.prototype.rotateLeft = function() {
 
 	for (var i = 0; i < this.tiles.reflectors.length; i++) {
@@ -84,6 +100,54 @@ Game.prototype.move = function() {
 	for (var i = 0; i < this.tiles.lines.length; i++) {
 
 		var line = this.tiles.lines[i];
+		for (var j = 0; j < this.tiles.reflectors.length; j++) {
+
+			var reflector = this.tiles.reflectors[j];
+			if (reflector.collidesWithLine(line) && !line.followUp) {
+
+				switch(line.type) {
+
+					case 1:
+						switch(reflector.type) {
+
+							case 1:
+							case 2:
+								var newLine = this.addLine(3, line.endX, line.startY, 0, config.blockSize);
+								line.followUp = newLine;
+								line.targetSize = 0;
+								break;
+						}
+						break;
+				}
+				console.log(reflector.type);
+			}
+		}		
+		for (var j = 0; j < this.tiles.walls.length; j++) {
+
+			var wall = this.tiles.walls[j];
+			if (wall.collidesWithLine(line) && !line.followUp) {
+
+				var newLine;
+				switch(line.type) {
+
+					case 1:
+						newLine = this.addLine(3, line.endX, line.startY, 0, config.blockSize);
+						break;
+					case 2:
+						newLine = this.addLine(4, line.startX, line.endY, 0, config.blockSize);
+						break;
+					case 3:
+						newLine = this.addLine(1, line.endX, line.startY, 0, config.blockSize);
+						break;
+					case 4:
+						newLine = this.addLine(2, line.startX, line.endY, 0, config.blockSize);
+						break;
+				}
+				line.followUp = newLine;
+				line.targetSize = 0;
+				console.log(reflector.type);
+			}
+		}		
 		line.move();
 	}
 	this.drawGame();
@@ -121,10 +185,11 @@ Game.prototype.drawGame = function() {
 	}
 }
 
-Game.prototype.addLine = function(type, row, col, size) {
+Game.prototype.addLine = function(type, row, col, size, targetSize) {
 
-	var line = new Line(type, row, col, size);
+	var line = new Line(type, row, col, size, targetSize);
 	this.tiles.lines.push(line);
+	return line;
 }
 
 Game.prototype.addWall = function(type, row, col, size) {
