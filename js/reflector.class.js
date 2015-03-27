@@ -99,7 +99,7 @@ Reflector.prototype.collidesWithLine = function(line) {
 					|| (line.startX >= middleX && middleX >= line.endX)
 				)
 			) || (
-				(this.type > 3)
+				(this.type > 2)
 				&& (
 					(line.startX <= endX && endX <= line.endX) 
 					|| (line.startX >= endX && endX >= line.endX) 

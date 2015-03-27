@@ -36,15 +36,7 @@ Line.prototype.draw = function(context) {
 	context.strokeStyle = '#000000';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
-	if (this.targetSize > this.size) {
-
-		this.size += config.speed;
-		if (this.targetSize < this.size) {
-
-			this.size = this.targetSize;
-		}
-	}
-	else if (this.targetSize < this.size) {
+	if (this.targetSize < this.size) {
 
 		this.size -= config.speed;
 		if (this.targetSize > this.size) {
