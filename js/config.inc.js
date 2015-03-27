@@ -1,6 +1,6 @@
 var config = {
 
-		lineWidth: 3,
+		lineWidth: 5,
 		blockSize: 50,
 		speed: 5
 };

@@ -1,0 +1,59 @@
+{
+	"width": 7,
+	"height": 7,
+	"tiles": {
+		"walls": [
+			{
+				"type": 1,
+				"row": 0,
+				"col": 0,
+				"size": 7
+			}, {
+				"type": 2,
+				"row": 7,
+				"col": 0,
+				"size": 7
+			}, {
+				"type": 1,
+				"row": 0,
+				"col": 7,
+				"size": 7
+			}, {
+				"type": 2,
+				"row": 0,
+				"col": 0,
+				"size": 7
+			}
+		],
+		"lines": [
+			{
+				"type": 1,
+				"row": 1,
+				"col": 1,
+				"size": 1
+			}
+		],
+		"stars": [
+			{
+				"row": 5,
+				"col": 1
+			}
+		],
+		"reflectors": [
+			{
+				"type": 4,
+				"row": 5,
+				"col": 1,
+				"opt": null
+			}, {
+				"type": 1,
+				"row": 5,
+				"col": 5,
+				"opt": {
+					"rotatable": true,
+					"hideable": false
+				}
+			}
+		]
+	}
+}

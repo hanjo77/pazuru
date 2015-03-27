@@ -3,37 +3,92 @@ function Game() {
 	this.bgCanvas = null;
 	this.canvas = null;
 	this.context = null;
-	this.tiles = {
+	this.tiles = null;
 
-		lines: [],
-		reflectors: [],
-		walls: []
-	};
-
+	this.levelNr = 1;
 	this.gameLoop = null;
 	this.init();
 }
 
 Game.prototype.init = function() {
 
-	document.write('<canvas id="game"></canvas>');
+	this.loadLevel(this.levelNr);
+	this.startControls();
+}
+
+Game.prototype.loadLevel = function(levelNr) {
+
+	$('body').html('<canvas id="game"></canvas>');
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
-	this.canvas.width = 600;
-	this.canvas.height = 500;
-	// this.drawBgCanvas();
-	// this.context.drawImage(this.bgCanvas, 600, 500);
-	this.addReflector(1, 2, 2);
-	this.addReflector(2, 4, 2);
-	this.addReflector(3, 2, 4);
-	this.addReflector(4, 4, 4);
-	this.addWall(1, 0, 0, 8);
-	this.addWall(2, 8, 0, 8);
-	this.addWall(1, 0, 8, 8);
-	this.addWall(2, 0, 0, 8);
-	this.addLine(1, (0*config.blockSize)+(config.blockSize/2), (2*config.blockSize)+(config.blockSize/2), config.blockSize);
-	this.draw();
-	this.startControls();
+	$.ajax({
+		url: "js/level" + levelNr + ".json",
+		context: document.body
+	}).error(function() {
+		document.write("all done");
+	}).done(function(content) {
+		
+		var data = $.parseJSON(content);
+		var tmpObj;
+		pazuru.game.canvas.width = data.width*config.blockSize;
+		pazuru.game.canvas.height = data.height*config.blockSize;
+		pazuru.game.tiles = {
+
+			lines: [],
+			reflectors: [],
+			walls: [],
+			stars: []
+		};
+		if (data.tiles) {
+
+			if (data.tiles.walls) {
+
+				for (var i = 0; i < data.tiles.walls.length; i++) {
+
+					tmpObj = data.tiles.walls[i];
+					pazuru.game.addWall(tmpObj.type, tmpObj.row, tmpObj.col, tmpObj.size);
+				}
+			}
+			if (data.tiles.stars) {
+
+				for (var i = 0; i < data.tiles.stars.length; i++) {
+
+					tmpObj = data.tiles.stars[i];
+					pazuru.game.addStar(tmpObj.row, tmpObj.col);
+				}
+			}
+			if (data.tiles.reflectors) {
+
+				for (var i = 0; i < data.tiles.reflectors.length; i++) {
+
+					tmpObj = data.tiles.reflectors[i];
+					pazuru.game.addReflector(tmpObj.type, tmpObj.row, tmpObj.col, tmpObj.opt);
+				}
+			}
+			if (data.tiles.lines) {
+
+				for (var i = 0; i < data.tiles.lines.length; i++) {
+
+					tmpObj = data.tiles.lines[i];
+					var startX = tmpObj.col*config.blockSize;
+					var startY = tmpObj.row*config.blockSize;
+					switch(tmpObj.type) {
+
+						case 1:
+						case 3:
+							startY += (config.blockSize/2);
+							break;
+						case 2:
+						case 4:
+							startX += (config.blockSize/2);
+							break;
+					}
+					pazuru.game.addLine(tmpObj.type, startX, startY, tmpObj.size*config.blockSize);
+				}
+			}
+		}
+		pazuru.game.draw();
+	});
 }
 
 Game.prototype.startControls = function() {
@@ -45,7 +100,7 @@ Game.prototype.startControls = function() {
 
 			case 32: // space
 				if (!pazuru.game.gameLoop) {
-					
+
 					pazuru.game.gameLoop = window.setInterval(function() {
 
 						pazuru.game.move();
@@ -67,7 +122,10 @@ Game.prototype.rotateLeft = function() {
 	for (var i = 0; i < this.tiles.reflectors.length; i++) {
 
 		var reflector = this.tiles.reflectors[i];
-		reflector.rotateLeft();
+		if (reflector.rotatable) {
+
+			reflector.rotateLeft();
+		}
 	}
 	this.drawGame();
 }
@@ -77,7 +135,10 @@ Game.prototype.rotateRight = function() {
 	for (var i = 0; i < this.tiles.reflectors.length; i++) {
 
 		var reflector = this.tiles.reflectors[i];
-		reflector.rotateRight();
+		if (reflector.rotatable) {
+
+			reflector.rotateRight();
+		}
 	}
 	this.drawGame();
 }
@@ -216,6 +277,24 @@ Game.prototype.move = function() {
 				line.targetSize = 0;
 			}
 		}
+		for (var j = this.tiles.stars.length-1; j >= 0; j--) {
+
+			var star = this.tiles.stars[j];
+			if (star.collidesWithLine(line) && !line.followUp) {
+
+				this.tiles.stars.splice(j, 1);
+				if (this.tiles.stars.length < 1) {
+
+					if (this.gameLoop) {
+
+						window.clearInterval(this.gameLoop);
+						this.gameLoop = null;
+					}
+					this.levelNr++;
+					this.loadLevel(this.levelNr);
+				}
+			}
+		}
 		line.move();
 		if (line.size <= 0) {
 
@@ -265,14 +344,20 @@ Game.prototype.addLine = function(type, row, col, size, targetSize) {
 	return line;
 }
 
+Game.prototype.addStar = function(row, col) {
+
+	var star = new Star(col, row);
+	this.tiles.stars.push(star);
+}
+
 Game.prototype.addWall = function(type, row, col, size) {
 
 	var wall = new Wall(type, row, col, size);
 	this.tiles.walls.push(wall);
 }
 
-Game.prototype.addReflector = function(type, row, col) {
+Game.prototype.addReflector = function(type, row, col, options) {
 
-	var reflector = new Reflector(type, row, col);
+	var reflector = new Reflector(type, row, col, options);
 	this.tiles.reflectors.push(reflector);
 }

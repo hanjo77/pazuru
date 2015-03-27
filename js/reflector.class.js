@@ -1,6 +1,8 @@
-function Reflector(type, col, row) {
+function Reflector(type, col, row, options) {
 
 	this.type = type;
+	this.rotatable = options ? options.rotatable : false;
+	this.hideable = options ? options.hideable : false;
 	this.col = col;
 	this.row = row;
 	this.startX = this.col*config.blockSize;
@@ -9,7 +11,13 @@ function Reflector(type, col, row) {
 
 Reflector.prototype.draw = function(context) {
 
+	var dot = null;
 	context.strokeStyle = '#000000';
+	context.fillStyle = '#000000';
+	if (this.rotatable) {
+
+		context.strokeStyle = '#ff0000';
+	}
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
 	switch(this.type) {
@@ -18,31 +26,49 @@ Reflector.prototype.draw = function(context) {
 			context.moveTo(this.startX, this.startY);
 			context.lineTo(this.startX, this.startY+config.blockSize);
 			context.lineTo(this.startX+config.blockSize, this.startY);
-			context.lineTo(this.startX, this.startY);
+			if (this.hideable) {
+
+				dot = [this.startX+(config.blockSize*.3), this.startY+(config.blockSize*.3)]
+			}
 			break;
 
 		case 2:
 			context.moveTo(this.startX, this.startY);
 			context.lineTo(this.startX, this.startY+config.blockSize);
 			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
-			context.lineTo(this.startX, this.startY);
+			if (this.hideable) {
+
+				dot = [this.startX+(config.blockSize*.3), this.startY+(config.blockSize*.7)]
+			}
 			break;
 
 		case 3:
 			context.moveTo(this.startX, this.startY+config.blockSize);
 			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
 			context.lineTo(this.startX+config.blockSize, this.startY);
-			context.lineTo(this.startX, this.startY+config.blockSize);
+			if (this.hideable) {
+
+				dot = [this.startX+(config.blockSize*.7), this.startY+(config.blockSize*.7)]
+			}
 			break;
 
 		case 4:
 			context.moveTo(this.startX+config.blockSize, this.startY+config.blockSize);
 			context.lineTo(this.startX+config.blockSize, this.startY);
 			context.lineTo(this.startX, this.startY);
-			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
+			if (this.hideable) {
+
+				dot = [this.startX+(config.blockSize*.7), this.startY+(config.blockSize*.3)]
+			}
 			break;
 	}
+	context.closePath();
 	context.stroke();
+	if (dot) {
+
+		context.moveTo(this.startX+config.blockSize, this.startY+config.blockSize);
+		context.fillRect(dot[0]-config.lineWidth, dot[1]-config.lineWidth, config.lineWidth*2, config.lineWidth*2);
+	}
 }
 
 Reflector.prototype.collidesWithLine = function(line) {
