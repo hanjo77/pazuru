@@ -1,4 +1,4 @@
-function Wall(type, col, row, size) {
+function Wall(type, row, col, size) {
 
 	this.type = type;
 	this.col = col;

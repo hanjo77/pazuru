@@ -358,6 +358,6 @@ Game.prototype.addWall = function(type, row, col, size) {
 
 Game.prototype.addReflector = function(type, row, col, options) {
 
-	var reflector = new Reflector(type, row, col, options);
+	var reflector = new Reflector(type, col, row, options);
 	this.tiles.reflectors.push(reflector);
 }

@@ -1,54 +1,67 @@
 {
-	"width": 7,
-	"height": 7,
+	"width": 9,
+	"height": 6,
 	"tiles": {
 		"walls": [
 			{
 				"type": 1,
 				"row": 0,
 				"col": 0,
-				"size": 7
+				"size": 9
 			}, {
 				"type": 2,
 				"row": 0,
-				"col": 7,
-				"size": 7
+				"col": 0,
+				"size": 3
 			}, {
 				"type": 1,
-				"row": 7,
+				"row": 3,
 				"col": 0,
-				"size": 7
+				"size": 3
+			}, {
+				"type": 2,
+				"row": 3,
+				"col": 3,
+				"size": 3
+			}, {
+				"type": 1,
+				"row": 6,
+				"col": 3,
+				"size": 6
 			}, {
 				"type": 2,
 				"row": 0,
-				"col": 0,
-				"size": 7
+				"col": 9,
+				"size": 6
 			}
 		],
 		"lines": [
 			{
-				"type": 1,
-				"row": 1,
-				"col": 1,
+				"type": 3,
+				"row": 4,
+				"col": 8,
 				"size": 1
 			}
 		],
 		"stars": [
 			{
-				"row": 5,
+				"row": 1,
 				"col": 1
+			}, {
+				"row": 1,
+				"col": 7
 			}
 		],
 		"reflectors": [
 			{
-				"type": 4,
-				"row": 1,
-				"col": 5,
+				"type": 2,
+				"row": 4,
+				"col": 4,
 				"opt": null
 			}, {
 				"type": 1,
-				"row": 5,
-				"col": 5,
+				"row": 1,
+				"col": 4,
 				"opt": {
 					"rotatable": true,
 					"hideable": false
