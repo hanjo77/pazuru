@@ -31,12 +31,10 @@ Star.prototype.collidesWithLine = function(line) {
 	var startY = this.startY-(.5*config.blockSize); 
 	var endX = this.startX+(.5*config.blockSize); 
 	var endY = this.startY+(.5*config.blockSize); 
-	return ((
-			(line.startX < startX && endX <= line.endX)
-			|| (line.startX > startX && endX >= line.endX)
-		) && (
-			(startY < line.startY && line.endY <= endY)
-			|| (startY > line.startY && line.endY >= endY)
-		)
-		);
+	return (
+		line.endX >= startX 
+		&& line.endX <= endX 
+		&& line.endY >= startY 
+		&& line.endY <= endY
+	);
 }

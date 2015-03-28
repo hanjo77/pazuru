@@ -5,7 +5,7 @@ function Game() {
 	this.context = null;
 	this.tiles = null;
 
-	this.levelNr = 1;
+	this.levelNr = 2;
 	this.gameLoop = null;
 	this.init();
 }
@@ -37,7 +37,8 @@ Game.prototype.loadLevel = function(levelNr) {
 			lines: [],
 			reflectors: [],
 			walls: [],
-			stars: []
+			stars: [],
+			traps: []
 		};
 		if (data.tiles) {
 
@@ -47,6 +48,14 @@ Game.prototype.loadLevel = function(levelNr) {
 
 					tmpObj = data.tiles.walls[i];
 					pazuru.game.addWall(tmpObj.type, tmpObj.row, tmpObj.col, tmpObj.size);
+				}
+			}
+			if (data.tiles.traps) {
+
+				for (var i = 0; i < data.tiles.traps.length; i++) {
+
+					tmpObj = data.tiles.traps[i];
+					pazuru.game.addTrap(tmpObj.type, tmpObj.row, tmpObj.col);
 				}
 			}
 			if (data.tiles.stars) {
@@ -95,7 +104,6 @@ Game.prototype.startControls = function() {
 
 	$(document).keyup(function(event) {
 
-		console.log(event.keyCode);
 		switch(event.keyCode) {
 
 			case 32: // space
@@ -148,6 +156,15 @@ Game.prototype.move = function() {
 	for (var i = this.tiles.lines.length-1; i >= 0; i--) {
 
 		var line = this.tiles.lines[i];
+		for (var j = 0; j < this.tiles.traps.length; j++) {
+
+			var trap = this.tiles.traps[j];
+			if (trap.collidesWithLine(line)) {
+
+				line.followUp = line;
+				line.targetSize = 0;
+			}
+		}
 		for (var j = 0; j < this.tiles.reflectors.length; j++) {
 
 			var reflector = this.tiles.reflectors[j];
@@ -298,8 +315,17 @@ Game.prototype.move = function() {
 		line.move();
 		if (line.size <= 0) {
 
-			this.tiles.lines.splice(i, 1);
-			delete(line);
+			if (this.tiles.lines.length > 1) {
+
+				this.tiles.lines.splice(i, 1);
+				delete(line);
+			}
+			else {
+
+				window.clearInterval(this.gameLoop);
+				this.gameLoop = null;
+				this.loadLevel(this.levelNr);
+			}
 		}
 	}
 	this.drawGame();
@@ -342,6 +368,12 @@ Game.prototype.addLine = function(type, row, col, size, targetSize) {
 	var line = new Line(type, row, col, size, targetSize);
 	this.tiles.lines.push(line);
 	return line;
+}
+
+Game.prototype.addTrap = function(type, row, col) {
+
+	var trap = new Trap(type, row, col);
+	this.tiles.traps.push(trap);
 }
 
 Game.prototype.addStar = function(row, col) {

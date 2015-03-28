@@ -5,8 +5,8 @@ function Reflector(type, col, row, options) {
 	this.hideable = options ? options.hideable : false;
 	this.col = col;
 	this.row = row;
-	this.startX = this.col*config.blockSize;
-	this.startY = this.row*config.blockSize;
+	this.startX = (this.col*config.blockSize);
+	this.startY = (this.row*config.blockSize);
 }
 
 Reflector.prototype.draw = function(context) {

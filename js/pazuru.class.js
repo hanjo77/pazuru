@@ -13,6 +13,7 @@ importScript("reflector.class.js");
 importScript("wall.class.js");
 importScript("line.class.js");
 importScript("star.class.js");
+importScript("trap.class.js");
 importScript("game.class.js");
 
 function Pazuru() {

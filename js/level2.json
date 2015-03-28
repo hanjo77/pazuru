@@ -67,6 +67,13 @@
 					"hideable": false
 				}
 			}
+		],
+		"traps": [
+			{
+				"type": 2,
+				"row": 1,
+				"col": 9
+			}
 		]
 	}
 }
