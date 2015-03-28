@@ -8,6 +8,8 @@ function Game() {
 
 	this.levelNr = 1;
 	this.gameLoop = null;
+	this.cols = 0;
+	this.rows = 0;
 	this.init();
 }
 
@@ -15,6 +17,7 @@ Game.prototype.init = function() {
 
 	this.loadLevel(this.levelNr);
 	this.startControls();
+	this.updateSize();
 }
 
 Game.prototype.loadLevel = function(levelNr) {
@@ -30,10 +33,10 @@ Game.prototype.loadLevel = function(levelNr) {
 		pazuru.game.canvas.height = ((2*config.padding)+data.height)*config.blockSize;
 		pazuru.game.tiles = {
 
-			reflectors: [],
 			walls: [],
-			stars: [],
 			traps: [],
+			stars: [],
+			reflectors: [],
 			lines: []
 		};
 		if (data.tiles) {
@@ -92,7 +95,7 @@ Game.prototype.loadLevel = function(levelNr) {
 				}
 			}
 		}
-		pazuru.game.draw();
+		pazuru.game.updateSize();
 	}).error(function() { 
 
 		document.write("all done");
@@ -126,6 +129,33 @@ Game.prototype.startControls = function() {
 				break
 		}
 	})
+}
+
+window.onresize = function() {
+
+	pazuru.game.updateSize();
+	pazuru.game.loadLevel(pazuru.game.levelNr);
+}
+
+Game.prototype.updateSize = function() {
+
+	var screenSize = [$(window).width(), $(window).height()];
+	var blockSize = screenSize[0]/config.maxCols;
+	if (screenSize[1]/config.maxRows < blockSize) {
+
+		blockSize = screenSize[1]/config.maxRows;
+	}
+	blockSize = blockSize-(blockSize%config.speed);
+	config.blockSize = blockSize;
+	config.lineWidth = blockSize/10;
+	if (this.canvas) {
+
+		$(this.canvas).css({
+			left: ((screenSize[0]-this.canvas.width)/2) + "px",
+			top: ((screenSize[1]-this.canvas.height)/2) + "px",
+		});
+	}
+	this.draw();
 }
 
 Game.prototype.toggleHiddenReflectors = function() {
@@ -288,26 +318,38 @@ Game.prototype.move = function() {
 		for (var j = 0; j < this.tiles.walls.length; j++) {
 
 			var wall = this.tiles.walls[j];
-			if (wall.collidesWithLine(line) && !line.followUp) {
+			if (wall.collidesWithLine(line) && !line.followUp && line.targetSize != 0) {
 
-				var newLine;
-				switch(line.type) {
+				if (line.size == line.targetSize) {
 
-					case 1:
-						newLine = this.addLine(3, line.endX, line.startY, 0, config.blockSize);
-						break;
-					case 2:
-						newLine = this.addLine(4, line.startX, line.endY, 0, config.blockSize);
-						break;
-					case 3:
-						newLine = this.addLine(1, line.endX, line.startY, 0, config.blockSize);
-						break;
-					case 4:
-						newLine = this.addLine(2, line.startX, line.endY, 0, config.blockSize);
-						break;
+					var newType, newX, newY;
+					switch(line.type) {
+
+						case 1:
+							newType = 3;
+							newX = line.endX-config.speed;
+							newY = line.startY;
+							break;
+						case 2:
+							newType = 4;
+							newX = line.startX;
+							newY = line.endY-config.speed;
+							break;
+						case 3:
+							newType = 1;
+							newX = line.endX+config.speed;
+							newY = line.startY;
+							break;
+						case 4:
+							newType = 2;
+							newX = line.startX;
+							newY = line.endY+config.speed;
+							break;
+					}
+					var newLine = this.addLine(newType, newX, newY, config.speed, config.blockSize);
+					line.followUp = newLine;
+					line.targetSize = 0;
 				}
-				line.followUp = newLine;
-				line.targetSize = 0;
 			}
 		}
 		for (var j = this.tiles.stars.length-1; j >= 0; j--) {
@@ -372,25 +414,20 @@ Game.prototype.drawGame = function() {
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	for (var type in this.tiles) {
 
-		var started = false;
 		for (var i = 0; i < this.tiles[type].length; i++) {
 
 			var tile = this.tiles[type][i];
 			if (type == "walls" && tile.col) {
 
-				if (started) {
-
-					Wall.endDraw(this.context);
-				}
-				else {
-
-					started = true;
-				}
+				Wall.endDraw(this.context);
 				tile.startDraw(this.context);
 			}
 			tile.draw(this.context);
 		}
-		Wall.endDraw(this.context);
+		if (type == "walls") {
+
+			Wall.endDraw(this.context);
+		}
 	}
 }
 

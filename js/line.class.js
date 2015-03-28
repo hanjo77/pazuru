@@ -6,6 +6,7 @@ function Line(type, startX, startY, size, targetSize) {
 	this.endX = startX;
 	this.endY = startY;
 	this.size = size;
+	this.started = false;
 	if (targetSize) {
 
 		this.targetSize = targetSize;

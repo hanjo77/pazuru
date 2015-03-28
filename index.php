@@ -8,6 +8,10 @@
 		height: 100%;
 	}
 
+	#game {
+		position: absolute;
+	}
+
 	</style>
 	<script src="js/jquery.min.js"></script>
 	<script type="text/javascript" src="js/pazuru.class.js"></script>
