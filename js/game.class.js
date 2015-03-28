@@ -24,8 +24,8 @@ Game.prototype.loadLevel = function(levelNr) {
 	$.getJSON("js/level" + levelNr + ".json", function(data) {
 		
 		var tmpObj;
-		pazuru.game.canvas.width = data.width*config.blockSize;
-		pazuru.game.canvas.height = data.height*config.blockSize;
+		pazuru.game.canvas.width = ((2*config.padding)+data.width)*config.blockSize;
+		pazuru.game.canvas.height = ((2*config.padding)+data.height)*config.blockSize;
 		pazuru.game.tiles = {
 
 			lines: [],
@@ -86,11 +86,14 @@ Game.prototype.loadLevel = function(levelNr) {
 							startX += (config.blockSize/2);
 							break;
 					}
-					pazuru.game.addLine(tmpObj.type, startX, startY, tmpObj.size*config.blockSize);
+					pazuru.game.addLine(tmpObj.type, startX+(config.padding*config.blockSize), startY+(config.padding*config.blockSize), tmpObj.size*config.blockSize);
 				}
 			}
 		}
 		pazuru.game.draw();
+	}).error(function() { 
+
+		document.write("all done");
 	});
 }
 
@@ -350,40 +353,47 @@ Game.prototype.drawGame = function() {
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	for (var type in this.tiles) {
 
+		var started = false;
 		for (var i = 0; i < this.tiles[type].length; i++) {
 
+			if (type == "walls" && !started) {
+
+				this.tiles[type][i].startDraw(this.context);
+				started = true;
+			}
 			this.tiles[type][i].draw(this.context);
 		}
+		Wall.endDraw(this.context);
 	}
 }
 
-Game.prototype.addLine = function(type, row, col, size, targetSize) {
+Game.prototype.addLine = function(type, startX, startY, size, targetSize) {
 
-	var line = new Line(type, row, col, size, targetSize);
+	var line = new Line(type, startX, startY, size, targetSize);
 	this.tiles.lines.push(line);
 	return line;
 }
 
 Game.prototype.addTrap = function(type, row, col) {
 
-	var trap = new Trap(type, row, col);
+	var trap = new Trap(type, config.padding+row, config.padding+col);
 	this.tiles.traps.push(trap);
 }
 
 Game.prototype.addStar = function(row, col) {
 
-	var star = new Star(col, row);
+	var star = new Star(config.padding+col, config.padding+row);
 	this.tiles.stars.push(star);
 }
 
 Game.prototype.addWall = function(type, row, col, size) {
 
-	var wall = new Wall(type, row, col, size);
+	var wall = new Wall(type, config.padding+row, config.padding+col, size);
 	this.tiles.walls.push(wall);
 }
 
 Game.prototype.addReflector = function(type, row, col, options) {
 
-	var reflector = new Reflector(type, col, row, options);
+	var reflector = new Reflector(type, config.padding+col, config.padding+row, options);
 	this.tiles.reflectors.push(reflector);
 }

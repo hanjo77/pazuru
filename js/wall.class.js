@@ -8,24 +8,32 @@ function Wall(type, row, col, size) {
 	this.startY = this.row*config.blockSize;
 }
 
-Wall.prototype.draw = function(context) {
+Wall.prototype.startDraw = function(context) {
 
 	context.strokeStyle = '#000000';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
+	context.moveTo(this.startX, this.startY);
+}
+
+Wall.endDraw = function(context) {
+
+	context.closePath();
+	context.stroke();
+}
+
+Wall.prototype.draw = function(context) {
+
 	switch(this.type) {
 
 		case 1: // horizontal
-			context.moveTo(this.startX, this.startY);
 			context.lineTo(this.startX+(this.size*config.blockSize), this.startY);
 			break;
 
 		case 2: // vertical
-			context.moveTo(this.startX, this.startY);
 			context.lineTo(this.startX, this.startY+(this.size*config.blockSize));
 			break;
 	}
-	context.stroke();
 }
 
 Wall.prototype.collidesWithLine = function(line) {

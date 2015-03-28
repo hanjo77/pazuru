@@ -4,11 +4,6 @@
 	"tiles": {
 		"walls": [
 			{
-				"type": 1,
-				"row": 0,
-				"col": 0,
-				"size": 9
-			}, {
 				"type": 2,
 				"row": 0,
 				"col": 0,
@@ -33,6 +28,11 @@
 				"row": 0,
 				"col": 9,
 				"size": 6
+			}, {
+				"type": 1,
+				"row": 0,
+				"col": 0,
+				"size": 9
 			}
 		],
 		"lines": [
