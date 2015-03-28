@@ -3,6 +3,7 @@ function Reflector(type, col, row, options) {
 	this.type = type;
 	this.rotatable = options ? options.rotatable : false;
 	this.hideable = options ? options.hideable : false;
+	this.hidden = options ? options.hidden : false;
 	this.col = col;
 	this.row = row;
 	this.startX = (this.col*config.blockSize);
@@ -13,11 +14,15 @@ Reflector.prototype.draw = function(context) {
 
 	var dot = null;
 	context.strokeStyle = '#000000';
-	context.fillStyle = '#000000';
 	if (this.rotatable) {
 
 		context.strokeStyle = '#ff0000';
 	}
+	if (this.hideable && this.hidden) {
+
+		context.strokeStyle = '#cccccc';
+	}
+	context.fillStyle = context.strokeStyle;
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
 	switch(this.type) {
@@ -78,79 +83,83 @@ Reflector.prototype.collidesWithLine = function(line) {
 	var endX = this.startX+config.blockSize; 
 	var endY = this.startY+config.blockSize; 
 	return (
-	(
-		(line.type == 1)
-		&& (this.startY < line.startY && line.startY < endY)
-		&& (
+	(!this.hidden) && 
+		(
 			(
-				(this.type > 2) 
+				(line.type == 1)
+				&& (this.startY < line.startY && line.startY < endY)
 				&& (
-					(line.startX <= middleX && middleX <= line.endX) 
-					|| (line.startX >= middleX && middleX >= line.endX) 
+					(
+						(this.type > 2) 
+						&& (
+							(line.startX <= middleX && middleX <= line.endX) 
+							|| (line.startX >= middleX && middleX >= line.endX) 
+						)
+					) || (
+						(this.type < 3)
+						&& (
+							(line.startX <= this.startX && this.startX <= line.endX) 
+							|| (line.startX >= this.startX && this.startX >= line.endX) 
+						)
+					)
 				)
 			) || (
-				(this.type < 3)
+				(line.type == 2) 
+				&& (this.startX < line.startX && line.startX < endX)
 				&& (
-					(line.startX <= this.startX && this.startX <= line.endX) 
-					|| (line.startX >= this.startX && this.startX >= line.endX) 
+					(
+						(this.type > 1 && this.type < 4) 
+						&& (
+							(line.startY <= middleY && middleY <= line.endY) 
+							|| (line.startY >= middleY && middleY >= line.endY) 
+						)
+					) || (
+						(this.type < 2 || this.type > 3)
+						&& (
+							(line.startY <= this.startY && this.startY <= line.endY) 
+							|| (line.startY >= this.startY && this.startY >= line.endY) 
+						)
+					)
+				)
+			) || (
+				(line.type == 3) 
+				&& (this.startY < line.startY && line.startY < endY)
+				&& (
+					(
+						(this.type < 3)
+						&& (
+							(line.startX <= middleX && middleX <= line.endX) 
+							|| (line.startX >= middleX && middleX >= line.endX)
+						)
+					) || (
+						(this.type > 2)
+						&& (
+							(line.startX <= endX && endX <= line.endX) 
+							|| (line.startX >= endX && endX >= line.endX) 
+						)
+					)
+				)
+			) || (
+				(line.type == 4) 
+				&& (this.startX < line.startX && line.startX < endX)
+				&& (
+					(
+						(this.type < 2 || this.type > 3) 
+						&& (
+							(line.startY <= middleY && middleY <= line.endY) 
+							|| (line.startY >= middleY && middleY >= line.endY) 
+						)
+					) || (
+						(this.type > 1 && this.type < 4)
+						&& (
+							(line.startY <= endY && endY <= line.endY) 
+							|| (line.startY >= endY && endY >= line.endY)
+						)
+					)
 				)
 			)
 		)
-	) || (
-		(line.type == 2) 
-		&& (this.startX < line.startX && line.startX < endX)
-		&& (
-			(
-				(this.type > 1 && this.type < 4) 
-				&& (
-					(line.startY <= middleY && middleY <= line.endY) 
-					|| (line.startY >= middleY && middleY >= line.endY) 
-				)
-			) || (
-				(this.type < 2 || this.type > 3)
-				&& (
-					(line.startY <= this.startY && this.startY <= line.endY) 
-					|| (line.startY >= this.startY && this.startY >= line.endY) 
-				)
-			)
-		)
-	) || (
-		(line.type == 3) 
-		&& (this.startY < line.startY && line.startY < endY)
-		&& (
-			(
-				(this.type < 3)
-				&& (
-					(line.startX <= middleX && middleX <= line.endX) 
-					|| (line.startX >= middleX && middleX >= line.endX)
-				)
-			) || (
-				(this.type > 2)
-				&& (
-					(line.startX <= endX && endX <= line.endX) 
-					|| (line.startX >= endX && endX >= line.endX) 
-				)
-			)
-		)
-	) || (
-		(line.type == 4) 
-		&& (this.startX < line.startX && line.startX < endX)
-		&& (
-			(
-				(this.type < 2 || this.type > 3) 
-				&& (
-					(line.startY <= middleY && middleY <= line.endY) 
-					|| (line.startY >= middleY && middleY >= line.endY) 
-				)
-			) || (
-				(this.type > 1 && this.type < 4)
-				&& (
-					(line.startY <= endY && endY <= line.endY) 
-					|| (line.startY >= endY && endY >= line.endY)
-				)
-			)
-		)
-	));
+	);
 }
 
 Reflector.prototype.rotateLeft = function() {

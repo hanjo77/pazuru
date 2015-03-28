@@ -1,0 +1,183 @@
+{
+	"width": 11,
+	"height": 11,
+	"tiles": {
+		"walls": [
+			{
+				"type": 2,
+				"row": 5,
+				"col": 5,
+				"size": 1
+			}, {
+				"type": 1,
+				"size": 1
+			}, {
+				"type": 2,
+				"size": -1
+			}, {
+				"type": 1,
+				"size": -1
+			}, {
+				"type": 2,
+				"row": 0,
+				"col": 2,
+				"size": 2
+			}, {
+				"type": 1,
+				"size": -2
+			}, {
+				"type": 2,
+				"size": 3
+			}, {
+				"type": 1,
+				"size": 2
+			}, {
+				"type": 2,
+				"size": 1
+			}, {
+				"type": 1,
+				"size": -2
+			}, {
+				"type": 2,
+				"size": 3
+			}, {
+				"type": 1,
+				"size": 2
+			}, {
+				"type": 2,
+				"size": 2
+			}, {
+				"type": 1,
+				"size": 3
+			}, {
+				"type": 2,
+				"size": -2
+			}, {
+				"type": 1,
+				"size": 1
+			}, {
+				"type": 2,
+				"size": 2
+			}, {
+				"type": 1,
+				"size": 3
+			}, {
+				"type": 2,
+				"size": -2
+			}, {
+				"type": 1,
+				"size": 2
+			}, {
+				"type": 2,
+				"size": -3
+			}, {
+				"type": 1,
+				"size": -2
+			}, {
+				"type": 2,
+				"size": -1
+			}, {
+				"type": 1,
+				"size": 2
+			}, {
+				"type": 2,
+				"size": -3
+			}, {
+				"type": 1,
+				"size": -2
+			}, {
+				"type": 2,
+				"size": -2
+			}, {
+				"type": 1,
+				"size": -3
+			}, {
+				"type": 2,
+				"size": 2
+			}, {
+				"type": 1,
+				"size": -1
+			}, {
+				"type": 2,
+				"size": -2
+			}, {
+				"type": 1,
+				"size": -3
+			}
+		],
+		"lines": [
+			{
+				"type": 4,
+				"row": 10,
+				"col": 7,
+				"size": 1
+			}
+		],
+		"stars": [
+			{
+				"row": 1,
+				"col": 3
+			}, {
+				"row": 1,
+				"col": 7
+			}, {
+				"row": 3,
+				"col": 1
+			}, {
+				"row": 3,
+				"col": 9
+			}, {
+				"row": 7,
+				"col": 1
+			}, {
+				"row": 7,
+				"col": 9
+			}, {
+				"row": 9,
+				"col": 3
+			}
+		],
+		"reflectors": [
+			{
+				"type": 3,
+				"row": 3,
+				"col": 3,
+				"opt": {
+					"rotatable": true,
+					"hideable": false
+				}
+			}, {
+				"type": 2,
+				"row": 3,
+				"col": 7,
+				"opt": {
+					"rotatable": true,
+					"hideable": false
+				}
+			}, {
+				"type": 4,
+				"row": 7,
+				"col": 3,
+				"opt": {
+					"rotatable": true,
+					"hideable": false
+				}
+			}, {
+				"type": 1,
+				"row": 7,
+				"col": 7,
+				"opt": {
+					"rotatable": true,
+					"hideable": false
+				}
+			}
+		],
+		"traps": [
+			{
+				"type": 2,
+				"row": 3,
+				"col": 11
+			}
+		]
+	}
+}

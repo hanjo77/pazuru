@@ -1,66 +1,72 @@
 {
 	"width": 9,
-	"height": 6,
+	"height": 9,
 	"tiles": {
 		"walls": [
 			{
 				"type": 2,
 				"row": 0,
-				"col": 0,
-				"size": 3
-			}, {
-				"type": 1,
-				"row": 3,
-				"col": 0,
-				"size": 3
-			}, {
-				"type": 2,
-				"row": 3,
 				"col": 3,
 				"size": 3
 			}, {
 				"type": 1,
-				"row": 6,
-				"col": 3,
-				"size": 6
+				"size": -3
 			}, {
 				"type": 2,
-				"row": 0,
-				"col": 9,
-				"size": 6
+				"size": 3
 			}, {
 				"type": 1,
-				"row": 0,
-				"col": 0,
-				"size": 9
+				"size": 3
+			}, {
+				"type": 2,
+				"size": 3
+			}, {
+				"type": 1,
+				"size": 3
+			}, {
+				"type": 2,
+				"size": -3
+			}, {
+				"type": 1,
+				"size": 3
+			}, {
+				"type": 2,
+				"size": -3
+			}, {
+				"type": 1,
+				"size": -3
+			}, {
+				"type": 2,
+				"size": -3
+			}, {
+				"type": 1,
+				"size": -3
 			}
 		],
 		"lines": [
 			{
-				"type": 3,
+				"type": 1,
 				"row": 4,
-				"col": 8,
+				"col": 1,
 				"size": 1
 			}
 		],
 		"stars": [
 			{
 				"row": 1,
-				"col": 1
+				"col": 4
 			}, {
-				"row": 1,
+				"row": 4,
 				"col": 7
+			}, {
+				"row": 7,
+				"col": 4
 			}
 		],
 		"reflectors": [
 			{
-				"type": 2,
+				"type": 4,
 				"row": 4,
-				"col": 4,
-				"opt": null
-			}, {
-				"type": 1,
-				"row": 1,
 				"col": 4,
 				"opt": {
 					"rotatable": true,
@@ -71,7 +77,7 @@
 		"traps": [
 			{
 				"type": 2,
-				"row": 1,
+				"row": 4,
 				"col": 9
 			}
 		]

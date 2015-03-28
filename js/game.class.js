@@ -4,8 +4,9 @@ function Game() {
 	this.canvas = null;
 	this.context = null;
 	this.tiles = null;
+	this.lastWall = null;
 
-	this.levelNr = 2;
+	this.levelNr = 1;
 	this.gameLoop = null;
 	this.init();
 }
@@ -21,18 +22,19 @@ Game.prototype.loadLevel = function(levelNr) {
 	$('body').html('<canvas id="game"></canvas>');
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
-	$.getJSON("js/level" + levelNr + ".json", function(data) {
+	this.lastWall = null;
+	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
 		var tmpObj;
 		pazuru.game.canvas.width = ((2*config.padding)+data.width)*config.blockSize;
 		pazuru.game.canvas.height = ((2*config.padding)+data.height)*config.blockSize;
 		pazuru.game.tiles = {
 
-			lines: [],
 			reflectors: [],
 			walls: [],
 			stars: [],
-			traps: []
+			traps: [],
+			lines: []
 		};
 		if (data.tiles) {
 
@@ -101,6 +103,7 @@ Game.prototype.startControls = function() {
 
 	$(document).keyup(function(event) {
 
+		// console.log(event.keyCode);
 		switch(event.keyCode) {
 
 			case 32: // space
@@ -109,8 +112,11 @@ Game.prototype.startControls = function() {
 					pazuru.game.gameLoop = window.setInterval(function() {
 
 						pazuru.game.move();
-					}, 1000/60);
+					}, 1000/50);
 				}
+				break;
+			case 16: // shift
+				pazuru.game.toggleHiddenReflectors();
 				break;
 			case 37: // left
 				pazuru.game.rotateLeft();
@@ -120,6 +126,19 @@ Game.prototype.startControls = function() {
 				break
 		}
 	})
+}
+
+Game.prototype.toggleHiddenReflectors = function() {
+
+	for (var i = 0; i < this.tiles.reflectors.length; i++) {
+
+		var reflector = this.tiles.reflectors[i];
+		if (reflector.hideable) {
+
+			reflector.hidden = !reflector.hidden;
+		}
+	}
+	this.drawGame();
 }
 
 Game.prototype.rotateLeft = function() {
@@ -356,12 +375,20 @@ Game.prototype.drawGame = function() {
 		var started = false;
 		for (var i = 0; i < this.tiles[type].length; i++) {
 
-			if (type == "walls" && !started) {
+			var tile = this.tiles[type][i];
+			if (type == "walls" && tile.col) {
 
-				this.tiles[type][i].startDraw(this.context);
-				started = true;
+				if (started) {
+
+					Wall.endDraw(this.context);
+				}
+				else {
+
+					started = true;
+				}
+				tile.startDraw(this.context);
 			}
-			this.tiles[type][i].draw(this.context);
+			tile.draw(this.context);
 		}
 		Wall.endDraw(this.context);
 	}

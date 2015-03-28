@@ -1,11 +1,33 @@
 function Wall(type, row, col, size) {
 
+	if (!col) {
+
+		row = pazuru.game.lastWall.row;
+		col = pazuru.game.lastWall.col;
+	}
 	this.type = type;
 	this.col = col;
 	this.row = row;
 	this.size = size;
 	this.startX = this.col*config.blockSize;
 	this.startY = this.row*config.blockSize;
+	switch(this.type) {
+
+		case 1: // horizontal
+			pazuru.game.lastWall = {
+
+				"col": this.col+this.size,
+				"row": this.row
+			}
+			break;
+		case 2: // horizontal
+			pazuru.game.lastWall = {
+
+				"col": this.col,
+				"row": this.row+this.size
+			}
+			break;
+	}
 }
 
 Wall.prototype.startDraw = function(context) {
@@ -20,19 +42,28 @@ Wall.endDraw = function(context) {
 
 	context.closePath();
 	context.stroke();
+
 }
 
 Wall.prototype.draw = function(context) {
 
+	var col, row;
 	switch(this.type) {
 
 		case 1: // horizontal
-			context.lineTo(this.startX+(this.size*config.blockSize), this.startY);
+			col = this.startX+(this.size*config.blockSize);
+			row = this.startY;
 			break;
-
 		case 2: // vertical
-			context.lineTo(this.startX, this.startY+(this.size*config.blockSize));
+			col = this.startX;
+			row = this.startY+(this.size*config.blockSize);
 			break;
+	}
+	context.lineTo(col, row);
+	pazuru.game.lastWall = {
+
+		"col": col/config.blockSize,
+		"row": row/config.blockSize
 	}
 }
 

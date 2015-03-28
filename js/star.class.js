@@ -8,7 +8,7 @@ function Star(col, row) {
 
 Star.prototype.draw = function(context) {
 
-	context.strokeStyle = '#ff9900';
+	context.strokeStyle = '#ffcc00';
 	context.fillStyle = '#ffff00';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
@@ -21,7 +21,7 @@ Star.prototype.draw = function(context) {
 	context.lineTo(this.startX-(config.blockSize*.5), this.startY);
 	context.lineTo(this.startX-(config.blockSize*.2), this.startY-(config.blockSize*.2));
 	context.closePath();
-	context.fill();
+	// context.fill();
 	context.stroke();
 }
 

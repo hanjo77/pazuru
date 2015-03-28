@@ -10,19 +10,13 @@
 				"size": 7
 			}, {
 				"type": 2,
-				"row": 0,
-				"col": 7,
 				"size": 7
 			}, {
 				"type": 1,
-				"row": 7,
-				"col": 0,
-				"size": 7
+				"size": -7
 			}, {
 				"type": 2,
-				"row": 0,
-				"col": 0,
-				"size": 7
+				"size": -7
 			}
 		],
 		"lines": [
