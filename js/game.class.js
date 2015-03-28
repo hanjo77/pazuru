@@ -21,14 +21,8 @@ Game.prototype.loadLevel = function(levelNr) {
 	$('body').html('<canvas id="game"></canvas>');
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
-	$.ajax({
-		url: "js/level" + levelNr + ".json",
-		context: document.body
-	}).error(function() {
-		document.write("all done");
-	}).done(function(content) {
+	$.getJSON("js/level" + levelNr + ".json", function(data) {
 		
-		var data = $.parseJSON(content);
 		var tmpObj;
 		pazuru.game.canvas.width = data.width*config.blockSize;
 		pazuru.game.canvas.height = data.height*config.blockSize;
