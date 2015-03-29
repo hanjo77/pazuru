@@ -6,7 +6,7 @@ function Game() {
 	this.tiles = null;
 	this.lastWall = null;
 
-	this.levelNr = 1;
+	this.levelNr = 17;
 	this.gameLoop = null;
 	this.cols = 0;
 	this.rows = 0;
@@ -33,15 +33,36 @@ Game.prototype.loadLevel = function(levelNr) {
 		pazuru.game.canvas.height = ((2*config.padding)+data.height)*config.blockSize;
 		pazuru.game.tiles = {
 
+			lines: [],
 			walls: [],
 			traps: [],
 			stars: [],
 			reflectors: [],
-			bricks: [],
-			lines: []
+			bricks: []
 		};
 		if (data.tiles) {
 
+			if (data.tiles.lines) {
+
+				for (var i = 0; i < data.tiles.lines.length; i++) {
+
+					tmpObj = data.tiles.lines[i];
+					var startX = tmpObj.col*config.blockSize;
+					var startY = tmpObj.row*config.blockSize;
+					switch(tmpObj.type) {
+
+						case 1:
+						case 3:
+							startY += (config.blockSize/2);
+							break;
+						case 2:
+						case 4:
+							startX += (config.blockSize/2);
+							break;
+					}
+					pazuru.game.addLine(tmpObj.type, startX+(config.padding*config.blockSize), startY+(config.padding*config.blockSize), tmpObj.size*config.blockSize);
+				}
+			}
 			if (data.tiles.walls) {
 
 				for (var i = 0; i < data.tiles.walls.length; i++) {
@@ -80,27 +101,6 @@ Game.prototype.loadLevel = function(levelNr) {
 
 					tmpObj = data.tiles.bricks[i];
 					pazuru.game.addBrick(tmpObj.row, tmpObj.col);
-				}
-			}
-			if (data.tiles.lines) {
-
-				for (var i = 0; i < data.tiles.lines.length; i++) {
-
-					tmpObj = data.tiles.lines[i];
-					var startX = tmpObj.col*config.blockSize;
-					var startY = tmpObj.row*config.blockSize;
-					switch(tmpObj.type) {
-
-						case 1:
-						case 3:
-							startY += (config.blockSize/2);
-							break;
-						case 2:
-						case 4:
-							startX += (config.blockSize/2);
-							break;
-					}
-					pazuru.game.addLine(tmpObj.type, startX+(config.padding*config.blockSize), startY+(config.padding*config.blockSize), tmpObj.size*config.blockSize);
 				}
 			}
 		}
@@ -459,6 +459,17 @@ Game.prototype.drawBg = function() {
 Game.prototype.drawGame = function() {
 
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	if (this.tiles && this.tiles.reflectors) {
+
+		for (var i = 0; i < this.tiles.reflectors.length; i++) {
+
+			var tile = this.tiles.reflectors[i];
+			if (tile.hidden) {
+
+				tile.draw(this.context);
+			}
+		}
+	}
 	for (var type in this.tiles) {
 
 		for (var i = 0; i < this.tiles[type].length; i++) {
@@ -469,7 +480,10 @@ Game.prototype.drawGame = function() {
 				Wall.endDraw(this.context);
 				tile.startDraw(this.context);
 			}
-			tile.draw(this.context);
+			if (type != "reflectors" || !tile.hidden) {
+
+				tile.draw(this.context);
+			}
 		}
 		if (type == "walls") {
 

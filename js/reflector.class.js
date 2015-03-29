@@ -22,7 +22,7 @@ Reflector.prototype.draw = function(context) {
 
 		context.strokeStyle = '#cccccc';
 	}
-	context.fillStyle = context.strokeStyle;
+	context.fillStyle = '#ffffff';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
 	switch(this.type) {
@@ -68,9 +68,11 @@ Reflector.prototype.draw = function(context) {
 			break;
 	}
 	context.closePath();
+	context.fill();
 	context.stroke();
 	if (dot) {
 
+		context.fillStyle = context.strokeStyle;
 		context.moveTo(this.startX+config.blockSize, this.startY+config.blockSize);
 		context.fillRect(dot[0]-config.lineWidth, dot[1]-config.lineWidth, config.lineWidth*2, config.lineWidth*2);
 	}

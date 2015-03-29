@@ -34,9 +34,9 @@ function Line(type, startX, startY, size, targetSize) {
 
 Line.prototype.draw = function(context) {
 
-	context.strokeStyle = '#000000';
-	context.lineWidth = config.lineWidth*1.5;
-	context.beginPath();
+//	context.strokeStyle = '#000000';
+//	context.lineWidth = config.lineWidth*1.5;
+//	context.beginPath();
 	if (this.targetSize > this.size) {
 
 		this.size += config.speed;
@@ -77,31 +77,31 @@ Line.prototype.draw = function(context) {
 			motion[1] = -1;
 			break;
 	}
-	context.moveTo(this.startX, this.startY);
-	context.lineTo(this.endX, this.endY);
-	context.stroke();
+//	context.moveTo(this.startX, this.startY);
+//	context.lineTo(this.endX, this.endY);
+//	context.stroke();
 
-	if (this.targetSize >= this.size) {
+	var shades = [
+		"#ffffff",
+		"#cccccc",
+		"#999999",
+		"#666666",
+		"#333333"
+	];
+	var len = ((config.blockSize)/shades.length);
+	for (var i = 0; i < shades.length; i++) {
 
-		var shades = [
-			"#ffffff",
-			"#cccccc",
-			"#999999",
-			"#666666",
-			"#333333"
-		];
-		var len = ((this.size/2)/shades.length);
-		for (var i = shades.length-1; i >= 0; i--) {
-
-			if (i*len <= this.size) {
-
-				context.strokeStyle = shades[i];
-				context.lineWidth = config.lineWidth*1.5;
-				context.beginPath();
-				context.moveTo(this.startX, this.startY);
-				context.lineTo(this.startX+(i*len*motion[0]), this.startY+(i*len*motion[1]));
-				context.stroke();
-			}
+		if (
+			((i*len) <= Math.abs(this.endX - this.startX))
+			|| ((i*len) <= Math.abs(this.endY - this.startY))
+			) {
+			
+			context.strokeStyle = shades[i];
+			context.lineWidth = config.lineWidth*1.5;
+			context.beginPath();
+			context.moveTo(this.startX+(i*len*motion[0]), this.startY+(i*len*motion[1]));
+			context.lineTo(this.startX+((i+1)*len*motion[0]), this.startY+((i+1)*len*motion[1]));
+			context.stroke();				
 		}
 	}
 }
