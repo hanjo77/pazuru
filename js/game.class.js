@@ -150,13 +150,15 @@ Game.prototype.updateSize = function() {
 
 	var screenSize = [$(window).width(), $(window).height()];
 	var blockSize = screenSize[0]/config.maxCols;
+	blockSize = blockSize-(blockSize%config.maxCols);
 	if (screenSize[1]/config.maxRows < blockSize) {
 
 		blockSize = screenSize[1]/config.maxRows;
+		blockSize = blockSize-(blockSize%config.maxRows);
 	}
-	blockSize = blockSize-(blockSize%config.speed);
 	config.blockSize = blockSize;
 	config.lineWidth = blockSize/10;
+	config.speed = blockSize/config.speedDivider;
 	if (this.canvas) {
 
 		$(this.canvas).css({
