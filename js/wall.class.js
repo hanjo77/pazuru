@@ -2,8 +2,8 @@ function Wall(type, row, col, size) {
 
 	if (!col) {
 
-		row = pazuru.game.lastWall.row;
-		col = pazuru.game.lastWall.col;
+		row = config.lastWall.row;
+		col = config.lastWall.col;
 	}
 	this.type = type;
 	this.col = col;
@@ -14,14 +14,14 @@ function Wall(type, row, col, size) {
 	switch(this.type) {
 
 		case 1: // horizontal
-			pazuru.game.lastWall = {
+			config.lastWall = {
 
 				"col": this.col+this.size,
 				"row": this.row
 			}
 			break;
 		case 2: // horizontal
-			pazuru.game.lastWall = {
+			config.lastWall = {
 
 				"col": this.col,
 				"row": this.row+this.size
@@ -60,7 +60,7 @@ Wall.prototype.draw = function(context) {
 			break;
 	}
 	context.lineTo(col, row);
-	pazuru.game.lastWall = {
+	config.lastWall = {
 
 		"col": col/config.blockSize,
 		"row": row/config.blockSize

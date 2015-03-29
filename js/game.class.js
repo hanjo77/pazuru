@@ -4,9 +4,8 @@ function Game() {
 	this.canvas = null;
 	this.context = null;
 	this.tiles = null;
-	this.lastWall = null;
 
-	this.levelNr = 17;
+	this.levelNr = 1;
 	this.gameLoop = null;
 	this.cols = 0;
 	this.rows = 0;
@@ -25,7 +24,7 @@ Game.prototype.loadLevel = function(levelNr) {
 	$('body').html('<canvas id="game"></canvas>');
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
-	this.lastWall = null;
+	config.lastWall = null;
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
 		var tmpObj;
