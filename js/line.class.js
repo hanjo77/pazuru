@@ -34,9 +34,6 @@ function Line(type, startX, startY, size, targetSize) {
 
 Line.prototype.draw = function(context) {
 
-//	context.strokeStyle = '#000000';
-//	context.lineWidth = config.lineWidth*1.5;
-//	context.beginPath();
 	if (this.targetSize > this.size) {
 
 		this.size += config.speed;
@@ -77,12 +74,9 @@ Line.prototype.draw = function(context) {
 			motion[1] = -1;
 			break;
 	}
-//	context.moveTo(this.startX, this.startY);
-//	context.lineTo(this.endX, this.endY);
-//	context.stroke();
 
 	var shades = [
-		"#ffffff",
+		// "#ffffff",
 		"#cccccc",
 		"#999999",
 		"#666666",

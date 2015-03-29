@@ -1,6 +1,6 @@
 function Wall(type, row, col, size) {
 
-	if (!col) {
+	if (!col && config.lastWall) {
 
 		row = config.lastWall.row;
 		col = config.lastWall.col;
