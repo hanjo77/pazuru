@@ -16,6 +16,17 @@ Editor.prototype.init = function() {
 
 	$('body').html('<canvas id="game"></canvas><div id="menu"></div>');
 	this.updateSize();
+	this.btns = [
+		new Wall(1, 1, .5, 1, 1),
+		new Line(1, .5*config.blockSize, config.blockSize, config.blockSize, config.blockSize),
+		new Star(.5, .5),
+		new Reflector(1, .5, .5, {}),
+		new Reflector(1, .5, .5, { rotatable: true }),
+		new Reflector(1, .5, .5, { hideable: true, hidden: false }),
+		new Reflector(1, .5, .5, { hideable: true, hidden: true }),
+		new Brick(.5, .5),
+		new Trap(1, 1, .5, 1, 1),
+	];
 	this.loadLevel(this.levelNr);
 	this.drawMenu();
 	this.startControls();
@@ -26,6 +37,18 @@ Editor.prototype.loadLevel = function(levelNr) {
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
 	this.lastWall = null;
+	$(this.canvas).click(function(e) {
+
+			$tile = $(e.target);
+			var col = Math.floor(e.offsetX/config.blockSize)-config.padding;
+			var row = Math.floor(e.offsetY/config.blockSize)-config.padding;
+			if (pazuru.editor.selectedItem) {
+
+				pazuru.editor.addTile(pazuru.editor.selectedItem, col, row);
+			}
+			console.log(col + " - " + row);
+	});
+
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
 		var tmpObj;
@@ -142,26 +165,17 @@ Editor.prototype.startControls = function() {
 
 Editor.prototype.drawMenu = function() {
 
-	var btns = [
-		new Wall(1, 1, .5, 1, 1),
-		new Line(1, .5*config.blockSize, config.blockSize, config.blockSize, config.blockSize),
-		new Star(.5, .5),
-		new Reflector(1, .5, .5, {}),
-		new Reflector(1, .5, .5, { rotatable: true }),
-		new Reflector(1, .5, .5, { hideable: true, hidden: false }),
-		new Reflector(1, .5, .5, { hideable: true, hidden: true }),
-		new Brick(.5, .5),
-		new Trap(1, 1, .5, 1, 1),
-	];
 	var $menu = $('#menu');
+	$menu.html("");
 	var menuHtml = "";
 	var btnCanvas, btnContext;
-	for (var i = 0; i < btns.length; i++) {
+	for (var i = 0; i < this.btns.length; i++) {
 
-		var btn = btns[i];
+		var btn = this.btns[i];
+		var btnActive = (btn == this.selectedItem) ? ' active' : '';
 		$('<canvas>').attr({
 		    id: 'btn_' + i,
-		    class: 'button_canvas',
+		    class: 'button_canvas' + btnActive,
 		    width: (config.blockSize*2),
 		    height: (config.blockSize*2)
 		}).css({
@@ -183,9 +197,38 @@ Editor.prototype.drawMenu = function() {
 		}
 		$(canvas).click(function(e) {
 
+			$tile = $(e.target);
 			$('.active').removeClass('active');
-			$(e.target).addClass('active');
-			console.log(e.target);
+			$tile.addClass('active');
+			var id = parseInt($tile.attr('id').replace('btn_', ''), 10);
+			var selectedItem = pazuru.editor.btns[id];
+			if (selectedItem.type) {
+
+				selectedItem.type++;
+				console.log(selectedItem.constructor.name);
+				switch(selectedItem.constructor.name) {
+
+					case "Reflector":
+					case "Line":
+
+						selectedItem.type %= 4;
+						if (selectedItem.type == 0) {
+
+							selectedItem.type = 4;							
+						}
+						break;
+					case "Wall":
+					case "Trap":
+						selectedItem.type %= 2;
+						if (selectedItem.type == 0) {
+
+							selectedItem.type = 2;							
+						}
+						break;
+				}
+			}
+			pazuru.editor.selectedItem = selectedItem;
+			pazuru.editor.drawMenu();
 		});
 	}
 
@@ -552,6 +595,34 @@ Editor.prototype.drawGame = function() {
 			Wall.endDraw(this.context);
 		}
 	}
+}
+
+Editor.prototype.addTile = function(tile, col, row) {
+
+	switch(tile.constructor.name) {
+
+		case "Line":
+			break;
+		case "Trap":
+			this.addTrap(tile.type, row, col);
+			break;
+		case "Brick":
+			this.addBrick(row, col);
+			break;
+		case "Star":
+			this.addStar(row, col);
+			break;
+		case "Reflector":
+			this.addReflector(tile.type, row, col, {
+				rotatable: tile.rotatable,
+				hideable: tile.hideable,
+				hidden: tile.hidden
+			})
+			break;
+		case "Wall":
+			break;
+	}
+	this.draw();
 }
 
 Editor.prototype.addLine = function(type, startX, startY, size, targetSize) {
