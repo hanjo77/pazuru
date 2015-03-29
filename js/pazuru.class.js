@@ -14,6 +14,7 @@ importScript("wall.class.js");
 importScript("line.class.js");
 importScript("star.class.js");
 importScript("trap.class.js");
+importScript("brick.class.js");
 importScript("game.class.js");
 
 function Pazuru() {

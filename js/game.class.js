@@ -37,6 +37,7 @@ Game.prototype.loadLevel = function(levelNr) {
 			traps: [],
 			stars: [],
 			reflectors: [],
+			bricks: [],
 			lines: []
 		};
 		if (data.tiles) {
@@ -71,6 +72,14 @@ Game.prototype.loadLevel = function(levelNr) {
 
 					tmpObj = data.tiles.reflectors[i];
 					pazuru.game.addReflector(tmpObj.type, tmpObj.row, tmpObj.col, tmpObj.opt);
+				}
+			}
+			if (data.tiles.bricks) {
+
+				for (var i = 0; i < data.tiles.bricks.length; i++) {
+
+					tmpObj = data.tiles.bricks[i];
+					pazuru.game.addBrick(tmpObj.row, tmpObj.col);
 				}
 			}
 			if (data.tiles.lines) {
@@ -370,6 +379,44 @@ Game.prototype.move = function() {
 				}
 			}
 		}
+		for (var j = this.tiles.bricks.length-1; j >= 0; j--) {
+
+			var brick = this.tiles.bricks[j];
+			if (brick.collidesWithLine(line) && !line.followUp) {
+
+				this.tiles.bricks.splice(j, 1);
+				if (line.size == line.targetSize) {
+
+					var newType, newX, newY;
+					switch(line.type) {
+
+						case 1:
+							newType = 3;
+							newX = line.endX-config.speed;
+							newY = line.startY;
+							break;
+						case 2:
+							newType = 4;
+							newX = line.startX;
+							newY = line.endY-config.speed;
+							break;
+						case 3:
+							newType = 1;
+							newX = line.endX+config.speed;
+							newY = line.startY;
+							break;
+						case 4:
+							newType = 2;
+							newX = line.startX;
+							newY = line.endY+config.speed;
+							break;
+					}
+					var newLine = this.addLine(newType, newX, newY, config.speed, config.blockSize);
+					line.followUp = newLine;
+					line.targetSize = 0;
+				}
+			}
+		}
 		line.move();
 		if (line.size <= 0) {
 
@@ -460,4 +507,10 @@ Game.prototype.addReflector = function(type, row, col, options) {
 
 	var reflector = new Reflector(type, config.padding+col, config.padding+row, options);
 	this.tiles.reflectors.push(reflector);
+}
+
+Game.prototype.addBrick = function(row, col) {
+
+	var brick = new Brick(config.padding+col, config.padding+row);
+	this.tiles.bricks.push(brick);
 }
