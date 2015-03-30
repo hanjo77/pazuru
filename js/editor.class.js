@@ -5,6 +5,7 @@ function Editor() {
 	this.context = null;
 	this.tiles = null;
 	this.lastWall = null;
+	this.currentLine = [];
 
 	this.levelNr = 17;
 	this.cols = 0;
@@ -32,6 +33,58 @@ Editor.prototype.init = function() {
 	this.startControls();
 }
 
+Editor.prototype.getItemForPosition = function(row, col, deleteItem) {
+
+	for (var elem in this.tiles) {
+
+		var tileItems = this.tiles[elem];
+		var firstIndex, lastIndex;
+		for (var i = tileItems.length-1; i >= 0; i--) {
+
+			var tileItem = tileItems[i];
+			if (elem == "lines") {
+
+				switch (tileItem.type) {
+
+					case 1:
+					case 2:
+						tileItem.col = Math.floor(tileItem.startX/config.blockSize);
+						tileItem.row = Math.floor(tileItem.startY/config.blockSize);
+						break;
+					case 3:
+					case 4:
+						tileItem.col = Math.floor(tileItem.endX/config.blockSize);
+						tileItem.row = Math.floor(tileItem.endY/config.blockSize);
+						break;
+				}
+			}
+			
+			if (elem == "walls") {
+
+				var firstIndex = tileItem.getFirst(tileItems);
+				var lastIndex = tileItem.getLast(tileItems);
+
+				console.log("delete " + firstIndex + " - " + lastIndex);
+
+				if (deleteItem) {
+
+					tileItems.splice(firstIndex, lastIndex-firstIndex);
+					i = firstIndex;
+				}
+			}
+			else if (tileItem && tileItem.col == col+config.padding && tileItem.row == row+config.padding) {
+
+				console.log(tileItem);
+				if (deleteItem) {
+
+					tileItems.splice(i, 1);
+				}
+				return tileItem;
+			}
+		}
+	}
+}
+
 Editor.prototype.loadLevel = function(levelNr) {
 
 	this.canvas = document.getElementById('game');
@@ -39,14 +92,57 @@ Editor.prototype.loadLevel = function(levelNr) {
 	this.lastWall = null;
 	$(this.canvas).click(function(e) {
 
-			$tile = $(e.target);
-			var col = Math.floor(e.offsetX/config.blockSize)-config.padding;
-			var row = Math.floor(e.offsetY/config.blockSize)-config.padding;
-			if (pazuru.editor.selectedItem) {
+		$tile = $(e.target);
+		var col = Math.floor(e.offsetX/config.blockSize)-config.padding;
+		var row = Math.floor(e.offsetY/config.blockSize)-config.padding;
+		if (pazuru.editor.selectedItem) {
 
+			if (pazuru.editor.selectedItem.constructor.name == "Wall") {
+
+				if (!config.firstWall) {
+
+					config.lastWall = {
+						"col": col, 
+						"row": row
+					};
+					config.firstWall = config.lastWall;
+				}
+				else {
+
+					var distX = col - config.lastWall.col;
+					var distY = row - config.lastWall.row;
+					if (Math.abs(distX) > Math.abs(distY)) {
+
+						pazuru.editor.addWall(1, null, null, distX);
+						if (Math.abs(distY) > 0) {
+
+							pazuru.editor.addWall(2, null, null, distY);
+						}
+					}
+					else {
+
+						pazuru.editor.addWall(2, null, null, distY);
+						if (Math.abs(distX) > 0) {
+
+							pazuru.editor.addWall(1, null, null, distX);
+						}
+					}
+				}
+				if (config.lastWall != config.firstWall && row == config.firstWall.row && col == config.firstWall.col) {
+
+					pazuru.editor.selectedItem = null;
+					config.lastWall = null;
+					config.firstWall = null;
+				}
+			}
+			else {
+
+				pazuru.editor.getItemForPosition(row, col, true);
 				pazuru.editor.addTile(pazuru.editor.selectedItem, col, row);
 			}
-			console.log(col + " - " + row);
+		}
+		pazuru.editor.draw();
+		console.log(pazuru.editor.tiles.walls);
 	});
 
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
@@ -202,7 +298,7 @@ Editor.prototype.drawMenu = function() {
 			$tile.addClass('active');
 			var id = parseInt($tile.attr('id').replace('btn_', ''), 10);
 			var selectedItem = pazuru.editor.btns[id];
-			if (selectedItem.type) {
+			if (selectedItem.type && selectedItem.constructor.name != "Wall") {
 
 				selectedItem.type++;
 				console.log(selectedItem.constructor.name);
@@ -217,7 +313,6 @@ Editor.prototype.drawMenu = function() {
 							selectedItem.type = 4;							
 						}
 						break;
-					case "Wall":
 					case "Trap":
 						selectedItem.type %= 2;
 						if (selectedItem.type == 0) {
@@ -231,7 +326,25 @@ Editor.prototype.drawMenu = function() {
 			pazuru.editor.drawMenu();
 		});
 	}
+	var active = "";
+	if (!this.selectedItem) {
 
+		active = " active";
+	}
+	$('<a>').attr({
+		id: 'btn_delete',
+		class: 'button' + active,
+		width: (config.blockSize*2),
+		height: (config.blockSize*2)
+	}).css({
+		width: (config.blockSize*2) + 'px',
+		height: (config.blockSize*2) + 'px'
+	}).html(
+		"DELETE"
+	).click(function(e) {
+		pazuru.editor.selectedItem = null;
+		pazuru.editor.drawMenu();
+	}).appendTo('#menu');
 
 	// $menu.html('<canvas id="menuBtn' + )
 }
@@ -646,7 +759,9 @@ Editor.prototype.addStar = function(row, col) {
 
 Editor.prototype.addWall = function(type, row, col, size) {
 
-	var wall = new Wall(type, config.padding+row, config.padding+col, size);
+	if (row) row = config.padding+row;
+	if (col) col = config.padding+col;
+	var wall = new Wall(type, row, col, size);
 	this.tiles.walls.push(wall);
 }
 

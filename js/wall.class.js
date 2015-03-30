@@ -5,6 +5,10 @@ function Wall(type, row, col, size) {
 		row = config.lastWall.row;
 		col = config.lastWall.col;
 	}
+	else {
+
+		this.first = true;
+	}
 	this.type = type;
 	this.col = col;
 	this.row = row;
@@ -36,6 +40,42 @@ Wall.prototype.startDraw = function(context) {
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
 	context.moveTo(this.startX, this.startY);
+}
+
+Wall.prototype.getFirst = function(walls) {
+
+	var started;
+	for (var i = walls.length-1; i >= 0; i--) {
+
+		var wall = walls[i];
+		if (this.col == wall.col && this.row == wall.row && wall.type == wall.type) {
+
+			started = true;
+		}
+		else if (started && wall.first) {
+
+			return i;
+		}
+	}
+	return 0
+}
+
+Wall.prototype.getLast = function(walls) {
+
+	var started;
+	for (var i = 0; i < walls.length; i++) {
+
+		var wall = walls[i];
+		if (this.col == wall.col && this.row == wall.row && wall.type == wall.type) {
+
+			started = true;
+		}
+		else if (started && wall.first) {
+
+			return i-1;
+		}
+	}
+	return walls.length;
 }
 
 Wall.endDraw = function(context) {
