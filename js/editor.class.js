@@ -118,6 +118,7 @@ Editor.prototype.loadLevel = function(levelNr) {
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
 	config.lastWall = null;
+	config.firstWall = null;
 	$(this.canvas).click(function(e) {
 
 		$tile = $(e.target);
