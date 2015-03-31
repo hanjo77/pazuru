@@ -64,15 +64,43 @@ Editor.prototype.getItemForPosition = function(row, col, deleteItem) {
 				var firstIndex = tileItem.getFirst(tileItems);
 				var lastIndex = tileItem.getLast(tileItems);
 
-				console.log("delete " + firstIndex + " - " + lastIndex);
+				if (tileItem) {
 
-				if (deleteItem) {
+					switch (tileItem.type) {
 
-					tileItems.splice(firstIndex, lastIndex-firstIndex);
-					i = firstIndex;
+						case 1:
+							if (
+								(tileItem.col <= col || tileItem.col+tileItem.size >= col)
+								&& (tileItem.row == row)
+								) {
+
+								console.log("delete " + firstIndex + " - " + lastIndex);
+								if (deleteItem) {
+
+									tileItems.splice(firstIndex, lastIndex-firstIndex);
+									i = firstIndex;
+								}
+							}
+							break;
+						case 2:
+							if (
+								(tileItem.row <= row || tileItem.row+tileItem.size >= row+config)
+								&& (tileItem.col == col+config)
+								) {
+
+								console.log("delete " + firstIndex + " - " + lastIndex);
+								if (deleteItem) {
+
+									tileItems.splice(firstIndex, lastIndex-firstIndex);
+									i = firstIndex;
+								}
+							}
+							break;
+					}
 				}
+
 			}
-			else if (tileItem && tileItem.col == col+config.padding && tileItem.row == row+config.padding) {
+			else if (tileItem && tileItem.col == col && tileItem.row == row) {
 
 				console.log(tileItem);
 				if (deleteItem) {
@@ -89,12 +117,13 @@ Editor.prototype.loadLevel = function(levelNr) {
 
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
-	this.lastWall = null;
+	config.lastWall = null;
 	$(this.canvas).click(function(e) {
 
 		$tile = $(e.target);
-		var col = Math.floor(e.offsetX/config.blockSize)-config.padding;
-		var row = Math.floor(e.offsetY/config.blockSize)-config.padding;
+		var col = Math.floor(e.offsetX/config.blockSize);
+		var row = Math.floor(e.offsetY/config.blockSize);
+		var started;
 		if (pazuru.editor.selectedItem) {
 
 			if (pazuru.editor.selectedItem.constructor.name == "Wall") {
@@ -111,37 +140,61 @@ Editor.prototype.loadLevel = function(levelNr) {
 
 					var distX = col - config.lastWall.col;
 					var distY = row - config.lastWall.row;
+
 					if (Math.abs(distX) > Math.abs(distY)) {
 
-						pazuru.editor.addWall(1, null, null, distX);
+						if (!config.lineStarted) {
+
+							pazuru.editor.addWall(1, config.lastWall.row-config.padding, config.lastWall.col-config.padding, distX);
+							config.lineStarted = true;
+						}
+						else {
+
+							pazuru.editor.addWall(1, undefined, undefined, distX);
+						}
 						if (Math.abs(distY) > 0) {
 
-							pazuru.editor.addWall(2, null, null, distY);
+							pazuru.editor.addWall(2, undefined, undefined, distY);
 						}
 					}
 					else {
 
-						pazuru.editor.addWall(2, null, null, distY);
+						if (!config.lineStarted) {
+
+							pazuru.editor.addWall(2, config.lastWall.row, config.lastWall.col, distY);
+							config.lineStarted = true;
+						}
+						else {
+
+							pazuru.editor.addWall(2, undefined, undefined, distY);
+						}
 						if (Math.abs(distX) > 0) {
 
-							pazuru.editor.addWall(1, null, null, distX);
+							pazuru.editor.addWall(1, undefined, undefined, distX);
 						}
 					}
-				}
-				if (config.lastWall != config.firstWall && row == config.firstWall.row && col == config.firstWall.col) {
+					pazuru.editor.draw();
+					if (row == config.firstWall.row && col == config.firstWall.col) {
 
-					pazuru.editor.selectedItem = null;
-					config.lastWall = null;
-					config.firstWall = null;
+						pazuru.editor.selectedItem = null;
+						config.lastWall = null;
+						config.firstWall = null;
+						config.lineStarted = undefined;
+						pazuru.editor.drawMenu();
+					}
 				}
 			}
 			else {
 
-				pazuru.editor.getItemForPosition(row, col, true);
 				pazuru.editor.addTile(pazuru.editor.selectedItem, col, row);
+				pazuru.editor.draw();
 			}
 		}
-		pazuru.editor.draw();
+		else {
+
+			pazuru.editor.getItemForPosition(row, col, true);
+			pazuru.editor.draw();
+		}
 		console.log(pazuru.editor.tiles.walls);
 	});
 
@@ -305,6 +358,12 @@ Editor.prototype.drawMenu = function() {
 				switch(selectedItem.constructor.name) {
 
 					case "Reflector":
+						selectedItem.type %= 4;
+						if (selectedItem.type == 0) {
+
+							selectedItem.type = 4;							
+						}
+						break;
 					case "Line":
 
 						selectedItem.type %= 4;
@@ -312,6 +371,27 @@ Editor.prototype.drawMenu = function() {
 
 							selectedItem.type = 4;							
 						}
+						switch(selectedItem.type) {
+
+							case 1:
+								selectedItem.row = .5;
+								selectedItem.col = 0;
+								break;
+							case 2:
+								selectedItem.row = .5;
+								selectedItem.col = 1;
+								break;
+							case 3:
+								selectedItem.row = 1;
+								selectedItem.col = 1.5;
+								break;
+							case 4:
+								selectedItem.row = 1.5;
+								selectedItem.col = 1;
+								break;
+						}
+						selectedItem.startX = selectedItem.col*config.blockSize;
+						selectedItem.startY = selectedItem.row*config.blockSize;
 						break;
 					case "Trap":
 						selectedItem.type %= 2;
@@ -319,6 +399,19 @@ Editor.prototype.drawMenu = function() {
 
 							selectedItem.type = 2;							
 						}
+						switch(selectedItem.type) {
+
+							case 1:						
+								selectedItem.row = 1;
+								selectedItem.col = .5;
+								break;
+							case 2:						
+								selectedItem.row = .5;
+								selectedItem.col = 1;
+								break;
+						}
+						selectedItem.startX = selectedItem.col*config.blockSize;
+						selectedItem.startY = selectedItem.row*config.blockSize;
 						break;
 				}
 			}
@@ -331,6 +424,7 @@ Editor.prototype.drawMenu = function() {
 
 		active = " active";
 	}
+
 	$('<a>').attr({
 		id: 'btn_delete',
 		class: 'button' + active,
@@ -344,6 +438,24 @@ Editor.prototype.drawMenu = function() {
 	).click(function(e) {
 		pazuru.editor.selectedItem = null;
 		pazuru.editor.drawMenu();
+		pazuru.editor.draw();
+	}).appendTo('#menu');
+
+	$('<a>').attr({
+		id: 'btn_delete',
+		class: 'button' + active,
+		width: (config.blockSize*2),
+		height: (config.blockSize*2)
+	}).css({
+		width: (config.blockSize*2) + 'px',
+		height: (config.blockSize*2) + 'px'
+	}).html(
+		"SAVE"
+	).click(function(e) {
+		pazuru.editor.selectedItem = null;
+		pazuru.editor.drawMenu();
+		pazuru.editor.draw();
+		console.log(JSON.stringify(pazuru.editor.tiles));
 	}).appendTo('#menu');
 
 	// $menu.html('<canvas id="menuBtn' + )
@@ -659,24 +771,30 @@ Editor.prototype.draw = function() {
 	this.drawGame();
 }
 
-Editor.prototype.drawBg = function() {
+Editor.prototype.drawBg = function(context) {
 
-	this.bgCanvas = document.getElementById('gameBg');
-	this.bgCanvas.width = this.canvas.width;
-	this.bgCanvas.height = this.canvas.height;
-	var ctx = this.bgCanvas.getContext('2d');
-	ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	ctx.strokeStyle = '#000000';
-	ctx.lineWidth = this.config.lineWidth;
-	ctx.beginPath();
-	ctx.moveTo(0, 0);
-	ctx.lineTo(100, 100);
-	ctx.stroke();
+	context.strokeStyle = '#CCCCCC';
+	context.lineWidth = config.lineWidth;
+	for (var row = config.padding; row < config.maxRows; row++) {
+
+		context.beginPath();
+		context.moveTo(config.padding*config.blockSize, row*config.blockSize);
+		context.lineTo((config.maxCols-2)*config.blockSize, row*config.blockSize);
+		context.stroke();
+	}
+	for (var col = config.padding; col < config.maxCols-1; col++) {
+
+		context.beginPath();
+		context.moveTo(col*config.blockSize, config.padding*config.blockSize);
+		context.lineTo(col*config.blockSize, (config.maxRows-1)*config.blockSize);
+		context.stroke();
+	}
 }
 
 Editor.prototype.drawGame = function() {
 
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.drawBg(this.context);
 	if (this.tiles && this.tiles.reflectors) {
 
 		for (var i = 0; i < this.tiles.reflectors.length; i++) {
@@ -715,18 +833,47 @@ Editor.prototype.addTile = function(tile, col, row) {
 	switch(tile.constructor.name) {
 
 		case "Line":
+			var tmpCol, tmpRow
+			switch(tile.type) {
+
+				case 1:
+					tmpCol = col*config.blockSize;
+					tmpRow = (row+.5)*config.blockSize;
+					break;
+				case 3:
+					tmpCol = (col+1)*config.blockSize;
+					tmpRow = (row+.5)*config.blockSize;
+					break;
+				case 2:
+					tmpCol = (col+.5)*config.blockSize;
+					tmpRow = row*config.blockSize;
+					break;
+				case 4:
+					tmpCol = (col+.5)*config.blockSize;
+					tmpRow = (row+1)*config.blockSize;
+					break;
+			}
+			this.addLine(tile.type, tmpCol, tmpRow, config.blockSize, config.blockSize);
 			break;
 		case "Trap":
-			this.addTrap(tile.type, row, col);
+			switch(tile.type) {
+
+				case 1:
+					this.addTrap(tile.type, row-config.padding, col-config.padding);
+					break;
+				case 2:
+					this.addTrap(tile.type, row-config.padding, col-config.padding);
+					break;
+			}
 			break;
 		case "Brick":
-			this.addBrick(row, col);
+			this.addBrick(row-config.padding, col-config.padding);
 			break;
 		case "Star":
-			this.addStar(row, col);
+			this.addStar(row-config.padding, col-config.padding);
 			break;
 		case "Reflector":
-			this.addReflector(tile.type, row, col, {
+			this.addReflector(tile.type, row-config.padding, col-config.padding, {
 				rotatable: tile.rotatable,
 				hideable: tile.hideable,
 				hidden: tile.hidden
@@ -759,9 +906,7 @@ Editor.prototype.addStar = function(row, col) {
 
 Editor.prototype.addWall = function(type, row, col, size) {
 
-	if (row) row = config.padding+row;
-	if (col) col = config.padding+col;
-	var wall = new Wall(type, row, col, size);
+	var wall = new Wall(type, config.padding+row, config.padding+col, size);
 	this.tiles.walls.push(wall);
 }
 
