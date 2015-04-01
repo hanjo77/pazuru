@@ -7,15 +7,22 @@ function Editor() {
 	this.lastWall = null;
 	this.currentLine = [];
 
-	this.levelNr = 17;
-	this.cols = 0;
-	this.rows = 0;
+	// this.levelNr = 20;
 	this.init();
 }
 
 Editor.prototype.init = function() {
 
 	$('body').html('<canvas id="game"></canvas><div id="menu"></div>');
+	this.canvas = document.getElementById('game');
+	this.context = this.canvas.getContext('2d');
+	$(this.canvas).click(function(e) {
+
+		$tile = $(e.target);
+		var col = Math.floor(e.offsetX/config.blockSize);
+		var row = Math.floor(e.offsetY/config.blockSize);
+		pazuru.editor.placeTile($tile, row, col);
+	});
 	this.updateSize();
 	this.btns = [
 		new Wall(1, 1, .5, 1, 1),
@@ -28,8 +35,18 @@ Editor.prototype.init = function() {
 		new Brick(.5, .5),
 		new Trap(1, 1, .5, 1, 1),
 	];
-	this.loadLevel(this.levelNr);
+	this.tiles = {
+
+		lines: [],
+		walls: [],
+		traps: [],
+		stars: [],
+		reflectors: [],
+		bricks: []
+	};
+//	this.loadLevel(this.levelNr);
 	this.drawMenu();
+	this.draw();
 	this.startControls();
 }
 
@@ -115,18 +132,9 @@ Editor.prototype.getItemForPosition = function(row, col, deleteItem) {
 
 Editor.prototype.loadLevel = function(levelNr) {
 
-	this.canvas = document.getElementById('game');
-	this.context = this.canvas.getContext('2d');
 	config.lastWall = null;
 	config.firstWall = null;
-	$(this.canvas).click(function(e) {
-
-		$tile = $(e.target);
-		var col = Math.floor(e.offsetX/config.blockSize);
-		var row = Math.floor(e.offsetY/config.blockSize);
-		pazuru.editor.placeTile($tile, row, col);
-	});
-
+	
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
 		var tmpObj;
@@ -207,8 +215,7 @@ Editor.prototype.loadLevel = function(levelNr) {
 		}
 		pazuru.editor.updateSize();
 	}).error(function() { 
-
-		document.write("all done");
+//		document.write("all done");
 	});
 }
 
@@ -315,7 +322,7 @@ Editor.prototype.drawMenu = function() {
 		pazuru.editor.selectedItem = null;
 		pazuru.editor.drawMenu();
 		pazuru.editor.draw();
-		console.log(JSON.stringify(pazuru.editor.tiles));
+		pazuru.editor.saveLevel();
 	}).appendTo('#menu');
 
 	// $menu.html('<canvas id="menuBtn' + )
@@ -331,7 +338,96 @@ var loadCanvas = function(id, tile) {
 window.onresize = function() {
 
 	pazuru.editor.updateSize();
-	pazuru.editor.loadLevel(pazuru.editor.levelNr);
+	// pazuru.editor.loadLevel(pazuru.editor.levelNr);
+}
+
+Editor.prototype.saveLevel = function() {
+
+	var obj = {
+		"width": this.maxCol-this.minCol,
+		"height": this.maxRow-this.minRow
+	};
+	var tiles = {};
+	for (var tileType in this.tiles) {
+
+		tiles[tileType] = [];
+		for (var i = 0; i < this.tiles[tileType].length; i++) {
+
+			var tile = this.tiles[tileType][i];
+			var tmpTile = {};
+			var t = $.extend({}, tile);
+			if (tile.col) t.col -= this.minCol;
+			if (tile.row) t.row -= this.minRow;
+			if (tile.startX) t.startX -= config.blockSize*this.minCol;
+			if (tile.startY) t.startY -= config.blockSize*this.minRow;
+			if (tile.hidden || tile.hideable || tile.rotatable) {
+
+				t.opt = {
+
+					"hidden": tile.hidden,
+					"hideable": tile.hideable,
+					"rotatable": tile.rotatable
+				};
+			}
+			if (!t.col && t.startX) {
+
+				t.col = Math.floor(t.startX/config.blockSize);
+			}
+			if (!t.row && t.startY) {
+
+				t.row = Math.floor(t.startY/config.blockSize);
+			}
+
+			switch (tileType) {
+
+				case "walls":
+					tmpTile = {
+						type: tile.type,
+						size: tile.size
+					};
+					if (tile.first) {
+
+						tmpTile.row = t.row;
+						tmpTile.col = t.col;
+					}
+					break;
+				case "traps":
+					tmpTile = {
+						type: tile.type,
+						row: t.row,
+						col: t.col
+					};
+					break;
+				case "lines":
+					tmpTile = {
+						type: tile.type,
+						size: tile.size/config.blockSize,
+						row: t.row,
+						col: t.col
+					};
+					break;
+				case "reflectors":
+					tmpTile = {
+						type: tile.type,
+						row: t.row,
+						col: t.col,
+						opt: t.opt
+					};
+					break;
+				case "stars":
+				case "bricks":
+					tmpTile = {
+						row: t.row,
+						col: t.col
+					};
+					break;
+			}
+
+			tiles[tileType].push(tmpTile);
+		}
+	}
+	obj.tiles = tiles;
+	console.log(JSON.stringify(obj));
 }
 
 Editor.prototype.placeTile = function($tile, row, col) {
@@ -501,6 +597,8 @@ Editor.prototype.updateSize = function() {
 	config.speed = blockSize/config.speedDivider;
 	if (this.canvas) {
 
+		this.canvas.width = blockSize*config.maxCols;
+		this.canvas.height = blockSize*config.maxRows;
 		$(this.canvas).css({
 			left: ((screenSize[0]-this.canvas.width)/2) + "px",
 			top: ((screenSize[1]-this.canvas.height)/2) + "px",
@@ -805,6 +903,10 @@ Editor.prototype.drawBg = function(context) {
 
 Editor.prototype.drawGame = function() {
 
+	this.minCol = undefined;	
+	this.maxCol = undefined;	
+	this.minRow = undefined;	
+	this.maxRow = undefined;	
 	this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	this.drawBg(this.context);
 	if (this.tiles && this.tiles.reflectors) {
@@ -831,6 +933,22 @@ Editor.prototype.drawGame = function() {
 			if (type != "reflectors" || !tile.hidden) {
 
 				tile.draw(this.context);
+			}
+			if (this.minCol == undefined || tile.col < this.minCol) {
+
+				this.minCol = tile.col;
+			}
+			if (this.maxCol == undefined || tile.col > this.maxCol) {
+
+				this.maxCol = tile.col;
+			}
+			if (this.minRow == undefined || tile.row < this.minRow) {
+
+				this.minRow = tile.row;
+			}
+			if (this.maxRow == undefined || tile.row > this.maxRow) {
+
+				this.maxRow = tile.row;
 			}
 		}
 		if (type == "walls") {

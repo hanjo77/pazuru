@@ -1,7 +1,7 @@
 var config = {
 
-		maxCols: 15,
-		maxRows: 13, 
+		maxCols: 20,
+		maxRows: 15, 
 		speedDivider: 10,
 		padding: 1
 };
