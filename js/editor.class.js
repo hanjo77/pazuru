@@ -124,79 +124,7 @@ Editor.prototype.loadLevel = function(levelNr) {
 		$tile = $(e.target);
 		var col = Math.floor(e.offsetX/config.blockSize);
 		var row = Math.floor(e.offsetY/config.blockSize);
-		var started;
-		if (pazuru.editor.selectedItem) {
-
-			if (pazuru.editor.selectedItem.constructor.name == "Wall") {
-
-				if (!config.firstWall) {
-
-					config.lastWall = {
-						"col": col, 
-						"row": row
-					};
-					config.firstWall = config.lastWall;
-				}
-				else {
-
-					var distX = col - config.lastWall.col;
-					var distY = row - config.lastWall.row;
-
-					if (Math.abs(distX) > Math.abs(distY)) {
-
-						if (!config.lineStarted) {
-
-							pazuru.editor.addWall(1, config.lastWall.row-config.padding, config.lastWall.col-config.padding, distX);
-							config.lineStarted = true;
-						}
-						else {
-
-							pazuru.editor.addWall(1, undefined, undefined, distX);
-						}
-						if (Math.abs(distY) > 0) {
-
-							pazuru.editor.addWall(2, undefined, undefined, distY);
-						}
-					}
-					else {
-
-						if (!config.lineStarted) {
-
-							pazuru.editor.addWall(2, config.lastWall.row, config.lastWall.col, distY);
-							config.lineStarted = true;
-						}
-						else {
-
-							pazuru.editor.addWall(2, undefined, undefined, distY);
-						}
-						if (Math.abs(distX) > 0) {
-
-							pazuru.editor.addWall(1, undefined, undefined, distX);
-						}
-					}
-					pazuru.editor.draw();
-					if (row == config.firstWall.row && col == config.firstWall.col) {
-
-						pazuru.editor.selectedItem = null;
-						config.lastWall = null;
-						config.firstWall = null;
-						config.lineStarted = undefined;
-						pazuru.editor.drawMenu();
-					}
-				}
-			}
-			else {
-
-				pazuru.editor.addTile(pazuru.editor.selectedItem, col, row);
-				pazuru.editor.draw();
-			}
-		}
-		else {
-
-			pazuru.editor.getItemForPosition(row, col, true);
-			pazuru.editor.draw();
-		}
-		console.log(pazuru.editor.tiles.walls);
+		pazuru.editor.placeTile($tile, row, col);
 	});
 
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
@@ -348,76 +276,7 @@ Editor.prototype.drawMenu = function() {
 		$(canvas).click(function(e) {
 
 			$tile = $(e.target);
-			$('.active').removeClass('active');
-			$tile.addClass('active');
-			var id = parseInt($tile.attr('id').replace('btn_', ''), 10);
-			var selectedItem = pazuru.editor.btns[id];
-			if (selectedItem.type && selectedItem.constructor.name != "Wall") {
-
-				selectedItem.type++;
-				console.log(selectedItem.constructor.name);
-				switch(selectedItem.constructor.name) {
-
-					case "Reflector":
-						selectedItem.type %= 4;
-						if (selectedItem.type == 0) {
-
-							selectedItem.type = 4;							
-						}
-						break;
-					case "Line":
-
-						selectedItem.type %= 4;
-						if (selectedItem.type == 0) {
-
-							selectedItem.type = 4;							
-						}
-						switch(selectedItem.type) {
-
-							case 1:
-								selectedItem.row = .5;
-								selectedItem.col = 0;
-								break;
-							case 2:
-								selectedItem.row = .5;
-								selectedItem.col = 1;
-								break;
-							case 3:
-								selectedItem.row = 1;
-								selectedItem.col = 1.5;
-								break;
-							case 4:
-								selectedItem.row = 1.5;
-								selectedItem.col = 1;
-								break;
-						}
-						selectedItem.startX = selectedItem.col*config.blockSize;
-						selectedItem.startY = selectedItem.row*config.blockSize;
-						break;
-					case "Trap":
-						selectedItem.type %= 2;
-						if (selectedItem.type == 0) {
-
-							selectedItem.type = 2;							
-						}
-						switch(selectedItem.type) {
-
-							case 1:						
-								selectedItem.row = 1;
-								selectedItem.col = .5;
-								break;
-							case 2:						
-								selectedItem.row = .5;
-								selectedItem.col = 1;
-								break;
-						}
-						selectedItem.startX = selectedItem.col*config.blockSize;
-						selectedItem.startY = selectedItem.row*config.blockSize;
-						break;
-				}
-			}
-			pazuru.editor.selectedItem = selectedItem;
-			pazuru.editor.drawMenu();
+			pazuru.editor.clickTile($tile);
 		});
 	}
 	var active = "";
@@ -475,9 +334,160 @@ window.onresize = function() {
 	pazuru.editor.loadLevel(pazuru.editor.levelNr);
 }
 
+Editor.prototype.placeTile = function($tile, row, col) {
+
+	var started;
+	if (this.selectedItem) {
+
+		if (this.selectedItem.constructor.name == "Wall") {
+
+			if (!config.firstWall) {
+
+				config.lastWall = {
+					"col": col, 
+					"row": row
+				};
+				config.firstWall = config.lastWall;
+			}
+			else {
+
+				var distX = col - config.lastWall.col;
+				var distY = row - config.lastWall.row;
+
+				if (Math.abs(distX) > Math.abs(distY)) {
+
+					if (!config.lineStarted) {
+
+						this.addWall(1, config.firstWall.row-config.padding, config.firstWall.col-config.padding, distX);
+						config.lineStarted = true;
+					}
+					else {
+
+						this.addWall(1, undefined, undefined, distX);
+					}
+					if (Math.abs(distY) > 0) {
+
+						this.addWall(2, undefined, undefined, distY);
+					}
+				}
+				else {
+
+					if (!config.lineStarted) {
+
+						this.addWall(2, config.firstWall.row-config.padding, config.firstWall.col-config.padding, distY);
+						config.lineStarted = true;
+					}
+					else {
+
+						this.addWall(2, undefined, undefined, distY);
+					}
+					if (Math.abs(distX) > 0) {
+
+						this.addWall(1, undefined, undefined, distX);
+					}
+				}
+				this.draw();
+				if (row == config.firstWall.row && col == config.firstWall.col) {
+
+					this.selectedItem = null;
+					config.lastWall = null;
+					config.firstWall = null;
+					config.lineStarted = undefined;
+					this.drawMenu();
+				}
+			}
+		}
+		else {
+
+			this.addTile(this.selectedItem, col, row);
+			this.draw();
+		}
+	}
+	else {
+
+		this.getItemForPosition(row, col, true);
+		this.draw();
+	}
+	console.log(this.tiles.walls);
+}
+
+Editor.prototype.clickTile = function($tile) {
+
+	$('.active').removeClass('active');
+	$tile.addClass('active');
+	var id = parseInt($tile.attr('id').replace('btn_', ''), 10);
+	var selectedItem = this.btns[id];
+	if (selectedItem.type && selectedItem.constructor.name != "Wall") {
+
+		selectedItem.type++;
+		console.log(selectedItem.constructor.name);
+		switch(selectedItem.constructor.name) {
+
+			case "Reflector":
+				selectedItem.type %= 4;
+				if (selectedItem.type == 0) {
+
+					selectedItem.type = 4;							
+				}
+				break;
+			case "Line":
+
+				selectedItem.type %= 4;
+				if (selectedItem.type == 0) {
+
+					selectedItem.type = 4;							
+				}
+				switch(selectedItem.type) {
+
+					case 1:
+						selectedItem.row = .5;
+						selectedItem.col = 0;
+						break;
+					case 2:
+						selectedItem.row = .5;
+						selectedItem.col = 1;
+						break;
+					case 3:
+						selectedItem.row = 1;
+						selectedItem.col = 1.5;
+						break;
+					case 4:
+						selectedItem.row = 1.5;
+						selectedItem.col = 1;
+						break;
+				}
+				selectedItem.startX = selectedItem.col*config.blockSize;
+				selectedItem.startY = selectedItem.row*config.blockSize;
+				break;
+			case "Trap":
+				selectedItem.type %= 2;
+				if (selectedItem.type == 0) {
+
+					selectedItem.type = 2;							
+				}
+				switch(selectedItem.type) {
+
+					case 1:						
+						selectedItem.row = 1;
+						selectedItem.col = .5;
+						break;
+					case 2:						
+						selectedItem.row = .5;
+						selectedItem.col = 1;
+						break;
+				}
+				selectedItem.startX = selectedItem.col*config.blockSize;
+				selectedItem.startY = selectedItem.row*config.blockSize;
+				break;
+		}
+	}
+	this.selectedItem = selectedItem;
+	this.drawMenu();
+} 
+
 Editor.prototype.updateSize = function() {
 
-	var screenSize = [$(window).width(), $(window).height()];
+	var screenSize = [$(window).width()*.8, $(window).height()];
 	var blockSize = screenSize[0]/config.maxCols;
 	blockSize = blockSize-(blockSize%config.maxCols);
 	if (screenSize[1]/config.maxRows < blockSize) {
@@ -485,6 +495,7 @@ Editor.prototype.updateSize = function() {
 		blockSize = screenSize[1]/config.maxRows;
 		blockSize = blockSize-(blockSize%config.maxRows);
 	}
+	screenSize = [blockSize*config.maxCols, blockSize*config.maxRows];
 	config.blockSize = blockSize;
 	config.lineWidth = blockSize/10;
 	config.speed = blockSize/config.speedDivider;

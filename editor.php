@@ -9,13 +9,15 @@
 	}
 
 	#game {
-		position: absolute;
+		position: relative;
+		float: left;
+		display: block;
 	}
 
 	#menu {
 
-		border: 5px solid #000000;
 		padding-top: 5px;
+		display: block;
 	}
 
 	#menu canvas {
