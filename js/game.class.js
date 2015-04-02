@@ -48,7 +48,10 @@ Game.prototype.loadLevel = function(levelNr) {
 		Util.addTouchControls(pazuru.content);
 	}).error(function() { 
 
-		document.write("all done");
+		$.get("templates/all_solved.php", function(data) {
+			
+			$("body").html(data);
+		});
 	});
 }
 

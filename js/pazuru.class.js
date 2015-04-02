@@ -53,19 +53,29 @@ Pazuru.prototype.loadEditor = function(levelNr) {
 		
 		window.location.hash += levelNr;
 	}
+		
 	this.content = new Editor(levelNr);
 }
 
 Pazuru.prototype.startLevel = function(levelNr) {
 	
-	if (!levelNr) {
+	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
-		levelNr = 1;
-	}
-	window.location.hash = levelNr;
-	$.get("templates/start_level.php?levelNr=" + levelNr, function(data) {
-		
-		$("body").html(data);
+		if (!levelNr) {
+			
+			levelNr = 1;
+		}
+		window.location.hash = levelNr;
+		$.get("templates/start_level.php?levelNr=" + levelNr, function(data) {
+			
+			$("body").html(data);
+		});
+	}).error(function() { 
+
+		$.get("templates/all_solved.php", function(data) {
+			
+			$("body").html(data);
+		});
 	});
 }
 
