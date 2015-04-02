@@ -2,8 +2,12 @@ function Util() {
 
 }
 
-Util.getItemForPosition = function(tiles, row, col, deleteItem) {
+Util.getItemForPosition = function(event, tiles, deleteItem) {
 
+	var clickX = event.offsetX;
+	var clickY = event.offsetY;
+	var col = Math.floor(clickX/config.blockSize);
+	var row = Math.floor(clickY/config.blockSize);
 	for (var elem in tiles) {
 
 		var tileItems = tiles[elem];
@@ -27,11 +31,30 @@ Util.getItemForPosition = function(tiles, row, col, deleteItem) {
 						break;
 				}
 			}
+			else if (elem == "traps") {
+				
+				switch(tileItem.type) {
+					
+					case 1:
+						clickY = event.offsetY+config.blockSize/2;
+						break;
+					case 2:
+						clickX = event.offsetX+config.blockSize/2;
+						break;
+				}
+				col = Math.floor(clickX/config.blockSize);
+				row = Math.floor(clickY/config.blockSize);
+			}
 			
 			if (elem == "walls") {
 
 				var firstIndex = tileItem.getFirst(tileItems);
 				var lastIndex = tileItem.getLast(tileItems);
+
+				clickX = event.offsetX+config.blockSize/2;
+				clickY = event.offsetY+config.blockSize/2;
+				col = Math.floor(clickX/config.blockSize);
+				row = Math.floor(clickY/config.blockSize);
 
 				if (tileItem) {
 
@@ -39,11 +62,13 @@ Util.getItemForPosition = function(tiles, row, col, deleteItem) {
 
 						case 1:
 							if (
-								(tileItem.col <= col || tileItem.col+tileItem.size >= col)
+								(
+									(tileItem.col <= col && tileItem.col+tileItem.size >= col)
+									|| (tileItem.col >= col && tileItem.col+tileItem.size <= col)
+								)
 								&& (tileItem.row == row)
 								) {
 
-								console.log("delete " + firstIndex + " - " + lastIndex);
 								if (deleteItem) {
 
 									tileItems.splice(firstIndex, lastIndex-firstIndex);
@@ -53,11 +78,13 @@ Util.getItemForPosition = function(tiles, row, col, deleteItem) {
 							break;
 						case 2:
 							if (
-								(tileItem.row <= row || tileItem.row+tileItem.size >= row+config)
-								&& (tileItem.col == col+config)
+								(
+									(tileItem.row <= row && tileItem.row+tileItem.size >= row)
+									|| (tileItem.row >= row && tileItem.row+tileItem.size <= row)
+								)
+								&& (tileItem.col == col)
 								) {
 
-								console.log("delete " + firstIndex + " - " + lastIndex);
 								if (deleteItem) {
 
 									tileItems.splice(firstIndex, lastIndex-firstIndex);
@@ -67,11 +94,9 @@ Util.getItemForPosition = function(tiles, row, col, deleteItem) {
 							break;
 					}
 				}
-
-			}
+			}			
 			else if (tileItem && tileItem.col == col && tileItem.row == row) {
 
-				console.log(tileItem);
 				if (deleteItem) {
 
 					tileItems.splice(i, 1);
@@ -222,10 +247,13 @@ Util.updateSize = function(parent, cropCanvas) {
 			parent.canvas.width = blockSize*config.maxCols;
 			parent.canvas.height = blockSize*config.maxRows;
 		}
-		$(parent.canvas).css({
-			left: (($(window).width()-parent.canvas.width)/2) + "px",
-			top: (($(window).height()-parent.canvas.height)/2) + "px",
-		});
+		else {
+			
+			$(parent.canvas).css({
+				left: (($(window).width()-parent.canvas.width)/2) + "px",
+				top: (($(window).height()-parent.canvas.height)/2) + "px",
+			});
+		}
 		parent.draw();
 	}
 }
@@ -519,7 +547,7 @@ Util.drawBg = function(context) {
 	}
 }
 
-Util.drawGame = function(parent, doDrawBg) {
+Util.drawGame = function(parent) {
 
 	if (parent && parent.context) {
 		
@@ -528,7 +556,7 @@ Util.drawGame = function(parent, doDrawBg) {
 		parent.minRow = undefined;	
 		parent.maxRow = undefined;	
 		parent.context.clearRect(0, 0, parent.canvas.width, parent.canvas.height);
-		if (doDrawBg && parent.context) {
+		if (parent.doDrawBg) {
 
 			Util.drawBg(parent.context);
 		}

@@ -6,6 +6,7 @@ function Editor() {
 	this.tiles = null;
 	this.lastWall = null;
 	this.currentLine = [];
+	this.doDrawBg = true;
 
 	// this.levelNr = 20;
 	this.init();
@@ -13,15 +14,12 @@ function Editor() {
 
 Editor.prototype.init = function() {
 
-	$('body').html('<canvas id="game"></canvas><div id="menu"></div>');
+	$('body').html('<div id="playground"><canvas id="game"></canvas></div><div id="menu"></div>');
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
 	$(this.canvas).click(function(e) {
 
-		$tile = $(e.target);
-		var col = Math.floor(e.offsetX/config.blockSize);
-		var row = Math.floor(e.offsetY/config.blockSize);
-		pazuru.content.placeTile($tile, row, col);
+		pazuru.content.placeTile(event);
 	});
 	Util.updateSize(this);
 	this.btns = [
@@ -47,6 +45,11 @@ Editor.prototype.init = function() {
 //	this.loadLevel(this.levelNr);
 	this.draw();
 	Util.startControls(this);
+
+	window.onresize = function() {
+
+		Util.updateSize(pazuru.content);
+	}
 }
 
 Editor.prototype.loadLevel = function(levelNr) {
@@ -65,7 +68,7 @@ Editor.prototype.loadLevel = function(levelNr) {
 Editor.prototype.draw = function() {
 
 	this.drawMenu();
-	Util.drawGame(this, true);
+	Util.drawGame(this);
 }
 
 Editor.prototype.drawMenu = function() {
@@ -132,7 +135,7 @@ Editor.prototype.drawMenu = function() {
 
 	$('<a>').attr({
 		id: 'btn_delete',
-		class: 'button' + active,
+		class: 'button',
 		width: (config.blockSize*2),
 		height: (config.blockSize*2)
 	}).css({
@@ -148,11 +151,6 @@ Editor.prototype.drawMenu = function() {
 	}).appendTo('#menu');
 
 	// $menu.html('<canvas id="menuBtn' + )
-}
-
-window.onresize = function() {
-
-	Util.updateSize(pazuru.content);
 }
 
 Editor.prototype.saveLevel = function() {
@@ -244,9 +242,34 @@ Editor.prototype.saveLevel = function() {
 	console.log(JSON.stringify(obj));
 }
 
-Editor.prototype.placeTile = function($tile, row, col) {
+Editor.prototype.placeTile = function(event) {
 
 	var started;
+	var clickX = event.offsetX;
+	var clickY = event.offsetY;
+	$tile = $(event.target);
+	if (this.selectedItem) {
+		
+		if (this.selectedItem.constructor.name == "Wall") {
+			
+			clickX += config.blockSize/2;
+			clickY += config.blockSize/2;
+		}
+		else if (this.selectedItem.constructor.name == "Trap") {
+			
+			switch(this.selectedItem.type) {
+				
+				case 1:
+					clickY += config.blockSize/2;
+					break;
+				case 2:
+					clickX += config.blockSize/2;
+					break;
+			}
+		}
+	}
+	var col = Math.floor(clickX/config.blockSize);
+	var row = Math.floor(clickY/config.blockSize);
 	if (this.selectedItem) {
 
 		if (this.selectedItem.constructor.name == "Wall") {
@@ -315,10 +338,9 @@ Editor.prototype.placeTile = function($tile, row, col) {
 	}
 	else {
 
-		Util.getItemForPosition(this.tiles, row, col, true);
+		Util.getItemForPosition(event, this.tiles, true);
 		this.draw();
 	}
-	console.log(this.tiles.walls);
 }
 
 Editor.prototype.clickTile = function($tile) {
@@ -349,8 +371,8 @@ Editor.prototype.clickTile = function($tile) {
 				switch(selectedItem.type) {
 
 					case 1:
-						selectedItem.row = .5;
-						selectedItem.col = 0;
+						selectedItem.row = 1;
+						selectedItem.col = .5;
 						break;
 					case 2:
 						selectedItem.row = .5;
