@@ -18,12 +18,13 @@ function Editor(levelNr) {
 Editor.prototype.init = function() {
 
 	$('body').html('<div id="playground">'
-		+ '<canvas id="game"></canvas>'
+		+ '<canvas id="editor"></canvas>'
 		+ '</div>'
+		+ '<a id="exitButton" onclick="pazuru.drawTitle()">Exit</a>'
 		+ '<a id="editButton" onclick="pazuru.content.toggleEditMenu()">Menu</a>'
 		+ '<div id="menu"></div>'
 	);
-	this.canvas = document.getElementById('game');
+	this.canvas = document.getElementById('editor');
 	this.context = this.canvas.getContext('2d');
 	$(this.canvas).click(function(e) {
 

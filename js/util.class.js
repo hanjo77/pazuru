@@ -189,6 +189,23 @@ Util.initLevel = function(parent, data, cropCanvas) {
 	Util.updateSize(parent, cropCanvas);
 }
 
+Util.addTouchControls = function(parent) {
+
+	config.currentParent = parent;
+	$("#game").click(function(event) {
+
+		if (!config.currentParent.gameLoop) {
+
+			config.currentParent.gameLoop = window.setInterval(function() {
+				
+				Util.move(config.currentParent);
+			}, 1000/50);
+		}
+		Util.toggleHiddenReflectors(config.currentParent);
+		Util.rotateRight(config.currentParent);
+	});
+}
+
 Util.startControls = function(parent) {
 
 	$(document).keyup(function(event) {

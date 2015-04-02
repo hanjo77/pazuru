@@ -36,13 +36,16 @@ Game.prototype.loadLevel = function(levelNr) {
 		
 		this.levelNr = levelNr;
 	}
-	$('body').html('<canvas id="game"></canvas>');
+	$('body').html('<canvas id="game"></canvas>'
+		+ '<a id="exitButton" onclick="pazuru.drawTitle()">Exit</a>'
+	);
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
 	config.lastWall = null;
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
 		Util.initLevel(pazuru.content, data, true);
+		Util.addTouchControls(pazuru.content);
 	}).error(function() { 
 
 		document.write("all done");

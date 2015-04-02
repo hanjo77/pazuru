@@ -2,6 +2,8 @@ html, body {
 	overflow: hidden;
 	height: 100%;
 	width: 100%;
+	margin: 0;
+	padding: 0;
 	text-transform: uppercase;
 	display: table;
 	font-family: 'Michroma', sans-serif;
@@ -36,9 +38,9 @@ html, body {
 	border: 5px solid #ff0000;
 }
 
-a.button, #editButton, .content li a {
+a.button, #editButton, #exitButton, .content li a {
 	padding: .8em 1.4em .8em;
-	margin: 0 .5em .5em 0;
+	margin: 0 .5em .5em .5em;
 	border: 5px solid #000000;
 	background-color: #ffffff;
 	color: #000000;
@@ -49,15 +51,20 @@ a.button, #editButton, .content li a {
 	font-weight: bold;
 }
 
-#editButton {
+#editButton, #exitButton {
 	margin: 0;
 	position: absolute;
-	top: 2em;
+	width: 5em;
+	top: 6.5em;
 	right: 2em;
 	display: inline-block;
 }
 
-a.button:hover, .content li a:hover, #editButton:hover {
+#exitButton {
+	top: 2em;
+}
+
+a.button:hover, .content li a:hover, #editButton:hover, #exitButton:hover {
 	border-color: #ff0000;
 	background-color: #000000;
 	color: #ff0000;
