@@ -1,4 +1,4 @@
-function Editor() {
+function Editor(levelNr) {
 
 	this.bgCanvas = null;
 	this.canvas = null;
@@ -8,7 +8,10 @@ function Editor() {
 	this.currentLine = [];
 	this.doDrawBg = true;
 
-	// this.levelNr = 20;
+	if (levelNr) {
+		
+		this.levelNr = levelNr;
+	}
 	this.init();
 }
 
@@ -42,7 +45,10 @@ Editor.prototype.init = function() {
 		reflectors: [],
 		bricks: []
 	};
-//	this.loadLevel(this.levelNr);
+	if (this.levelNr) {
+		
+		this.loadLevel(this.levelNr);
+	}
 	this.draw();
 	Util.startControls(this);
 
@@ -59,7 +65,7 @@ Editor.prototype.loadLevel = function(levelNr) {
 	
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
-		Util.initLevel(pazuru.content, true);
+		Util.initLevel(pazuru.content, data);
 	}).error(function() { 
 //		document.write("all done");
 	});

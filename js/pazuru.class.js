@@ -21,12 +21,12 @@ importScript("editor.class.js");
 
 function Pazuru() {
 	
-	this.drawTitle();
-	this.content;
+	this.handleHash();
 }
 
 Pazuru.prototype.drawTitle = function() {
 	
+	window.location.hash = "title";
 	$.get("templates/title.php", function(data) {
 		
 		$("body").html(data);
@@ -35,6 +35,7 @@ Pazuru.prototype.drawTitle = function() {
 
 Pazuru.prototype.loadGame = function(levelNr) {
 	
+	window.location.hash = levelNr;
 	if (this.content && this.content.constructor.name == "Game") {
 		
 		this.content.loadLevel(levelNr);
@@ -47,6 +48,11 @@ Pazuru.prototype.loadGame = function(levelNr) {
 
 Pazuru.prototype.loadEditor = function(levelNr) {
 	
+	window.location.hash = "editor";
+	if (levelNr) {
+		
+		window.location.hash += levelNr;
+	}
 	this.content = new Editor(levelNr);
 }
 
@@ -56,6 +62,7 @@ Pazuru.prototype.startLevel = function(levelNr) {
 		
 		levelNr = 1;
 	}
+	window.location.hash = levelNr;
 	$.get("templates/start_level.php?levelNr=" + levelNr, function(data) {
 		
 		$("body").html(data);
@@ -70,9 +77,41 @@ Pazuru.prototype.endLevel = function(levelNr) {
 	});
 }
 
+Pazuru.prototype.handleHash = function() {
+	
+	var hash = window.location.hash.replace("#", "");
+	var levelNr = parseInt(hash, 10);
+	if (!isNaN(levelNr)) {
+		
+		this.startLevel(levelNr);
+	}
+	else if (hash.indexOf("editor") > -1) {
+	
+		levelNr = parseInt(hash.replace("editor", ""), 10);
+		if (isNaN(levelNr)) {
+			
+			this.loadEditor();
+		}
+		else {
+			
+			this.loadEditor(levelNr);
+		}
+	}
+	else {
+		
+		this.drawTitle();
+	}
+}
+
 var pazuru;
 
 $(document).ready(function() {
 
 	pazuru = new Pazuru();
 });
+
+$(window).bind("hashchange", function(e) {
+	
+	pazuru.handleHash();
+});
+
