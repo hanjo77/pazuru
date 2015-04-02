@@ -33,14 +33,41 @@ Pazuru.prototype.drawTitle = function() {
 	});
 }
 
-Pazuru.prototype.loadGame = function() {
+Pazuru.prototype.loadGame = function(levelNr) {
 	
-	this.content = new Game();
+	if (this.content && this.content.constructor.name == "Game") {
+		
+		this.content.loadLevel(levelNr);
+	}
+	else {
+		
+		this.content = new Game(levelNr);
+	}
 }
 
-Pazuru.prototype.loadEditor = function() {
+Pazuru.prototype.loadEditor = function(levelNr) {
 	
-	this.content = new Editor();
+	this.content = new Editor(levelNr);
+}
+
+Pazuru.prototype.startLevel = function(levelNr) {
+	
+	if (!levelNr) {
+		
+		levelNr = 1;
+	}
+	$.get("templates/start_level.php?levelNr=" + levelNr, function(data) {
+		
+		$("body").html(data);
+	});
+}
+
+Pazuru.prototype.endLevel = function(levelNr) {
+	
+	$.get("templates/end_level.php?levelNr=" + levelNr, function(data) {
+		
+		$("body").html(data);
+	});
 }
 
 var pazuru;

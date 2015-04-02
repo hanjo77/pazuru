@@ -465,8 +465,7 @@ Util.move = function(parent) {
 						window.clearInterval(parent.gameLoop);
 						parent.gameLoop = null;
 					}
-					parent.levelNr++;
-					parent.loadLevel(parent.levelNr);
+					pazuru.endLevel(parent.levelNr);
 				}
 			}
 		}
@@ -520,7 +519,7 @@ Util.move = function(parent) {
 
 				window.clearInterval(parent.gameLoop);
 				parent.gameLoop = null;
-				parent.loadLevel(parent.levelNr);
+				pazuru.loadGame(parent.levelNr);
 			}
 		}
 	}

@@ -1,10 +1,22 @@
-function Game() {
+function Game(levelNr) {
 
 	this.canvas = null;
 	this.context = null;
 	this.tiles = null;
 
-	this.levelNr = 1;
+	if (levelNr) {
+		
+		this.levelNr = levelNr;
+	}
+	else {
+		
+		this.levelNr = 1;
+	}
+	if (this.gameLoop) {
+
+		window.clearInterval(this.gameLoop);
+		delete (this.gameLoop);
+	}
 	this.gameLoop = null;
 	this.cols = 0;
 	this.rows = 0;
@@ -20,6 +32,10 @@ Game.prototype.init = function() {
 
 Game.prototype.loadLevel = function(levelNr) {
 
+	if (levelNr) {
+		
+		this.levelNr = levelNr;
+	}
 	$('body').html('<canvas id="game"></canvas>');
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
