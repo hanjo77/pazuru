@@ -17,10 +17,30 @@ importScript("star.class.js");
 importScript("trap.class.js");
 importScript("brick.class.js");
 importScript("game.class.js");
+importScript("editor.class.js");
 
 function Pazuru() {
 	
-	this.game = new Game();
+	this.drawTitle();
+	this.content;
+}
+
+Pazuru.prototype.drawTitle = function() {
+	
+	$.get("templates/title.php", function(data) {
+		
+		$("body").html(data);
+	});
+}
+
+Pazuru.prototype.loadGame = function() {
+	
+	this.content = new Game();
+}
+
+Pazuru.prototype.loadEditor = function() {
+	
+	this.content = new Editor();
 }
 
 var pazuru;

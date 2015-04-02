@@ -21,7 +21,7 @@ Editor.prototype.init = function() {
 		$tile = $(e.target);
 		var col = Math.floor(e.offsetX/config.blockSize);
 		var row = Math.floor(e.offsetY/config.blockSize);
-		pazuru.editor.placeTile($tile, row, col);
+		pazuru.content.placeTile($tile, row, col);
 	});
 	Util.updateSize(this);
 	this.btns = [
@@ -56,7 +56,7 @@ Editor.prototype.loadLevel = function(levelNr) {
 	
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
-		Util.initLevel(pazuru.editor, true);
+		Util.initLevel(pazuru.content, true);
 	}).error(function() { 
 //		document.write("all done");
 	});
@@ -104,7 +104,7 @@ Editor.prototype.drawMenu = function() {
 			$(canvas).click(function(e) {
 
 				$tile = $(e.target);
-				pazuru.editor.clickTile($tile);
+				pazuru.content.clickTile($tile);
 			});
 		}
 	}
@@ -125,9 +125,9 @@ Editor.prototype.drawMenu = function() {
 	}).html(
 		"DELETE"
 	).click(function(e) {
-		pazuru.editor.selectedItem = null;
-		pazuru.editor.drawMenu();
-		pazuru.editor.draw();
+		pazuru.content.selectedItem = null;
+		pazuru.content.drawMenu();
+		pazuru.content.draw();
 	}).appendTo('#menu');
 
 	$('<a>').attr({
@@ -141,10 +141,10 @@ Editor.prototype.drawMenu = function() {
 	}).html(
 		"SAVE"
 	).click(function(e) {
-		pazuru.editor.selectedItem = null;
-		pazuru.editor.drawMenu();
-		pazuru.editor.draw();
-		pazuru.editor.saveLevel();
+		pazuru.content.selectedItem = null;
+		pazuru.content.drawMenu();
+		pazuru.content.draw();
+		pazuru.content.saveLevel();
 	}).appendTo('#menu');
 
 	// $menu.html('<canvas id="menuBtn' + )
@@ -152,7 +152,7 @@ Editor.prototype.drawMenu = function() {
 
 window.onresize = function() {
 
-	Util.updateSize(pazuru.editor);
+	Util.updateSize(pazuru.content);
 }
 
 Editor.prototype.saveLevel = function() {

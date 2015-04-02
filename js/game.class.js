@@ -26,7 +26,7 @@ Game.prototype.loadLevel = function(levelNr) {
 	config.lastWall = null;
 	$.getJSON("js/levels/level" + levelNr + ".json", function(data) {
 		
-		Util.initLevel(pazuru.game, data, true);
+		Util.initLevel(pazuru.content, data, true);
 	}).error(function() { 
 
 		document.write("all done");
@@ -35,8 +35,8 @@ Game.prototype.loadLevel = function(levelNr) {
 
 window.onresize = function() {
 
-	Util.updateSize(pazuru.game, true);
-	pazuru.game.loadLevel(pazuru.game.levelNr);
+	Util.updateSize(pazuru.content, true);
+	pazuru.content.loadLevel(pazuru.content.levelNr);
 }
 
 Game.prototype.draw = function() {
