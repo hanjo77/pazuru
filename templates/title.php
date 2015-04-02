@@ -1,9 +1,11 @@
-<h1>Pazuru</h1>
-<ul>
-	<li>
-		<a onclick="pazuru.startLevel()">Play</a>
-	</li>
-	<li>
-		<a onclick="pazuru.loadEditor()">Edit</a>
-	</li>
-</ul>
+<div class="content">
+	<h1>Pazuru</h1>
+	<ul>
+		<li>
+			<a href="#1">Play</a>
+		</li>
+		<li>
+			<a href="#editor">Edit</a>
+		</li>
+	</ul>
+</div>

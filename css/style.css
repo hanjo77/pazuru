@@ -1,7 +1,10 @@
 html, body {
 	overflow: hidden;
 	height: 100%;
-	font-family: 'Exo', sans-serif;
+	width: 100%;
+	text-transform: uppercase;
+	display: table;
+	font-family: 'Michroma', sans-serif;
 }
 
 #game {
@@ -11,9 +14,16 @@ html, body {
 }
 
 #menu {
-
-	padding-top: 5px;
+	padding: 2em;
+	right: 2em;
+	top: 2em;
 	display: block;
+	width: 18em;
+	float: right;
+	border: 5px solid #000000;
+	background-color: #ffffff;
+	position: absolute;
+	display: none;
 }
 
 #menu canvas {
@@ -26,12 +36,76 @@ html, body {
 	border: 5px solid #ff0000;
 }
 
-a.button {
-	height: 1.5em !important;
-	padding: 1.4em 1.4em .8em;
-	margin: 0;
-	border: 5px solid #000;
-	float: left;
-	display: inline-block;
+a.button, #editButton, .content li a {
+	padding: .8em 1.4em .8em;
+	margin: 0 .5em .5em 0;
+	border: 5px solid #000000;
+	background-color: #ffffff;
+	color: #000000;
+	display: block;
 	text-align: center;
+	font-size: 1em;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+#editButton {
+	margin: 0;
+	position: absolute;
+	top: 2em;
+	right: 2em;
+	display: inline-block;
+}
+
+a.button:hover, .content li a:hover, #editButton:hover {
+	border-color: #ff0000;
+	background-color: #000000;
+	color: #ff0000;
+}
+
+.content {	
+	height: auto;
+	width: auto;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.content h1, .content h2, .content h3 {
+	color: #ff0000;
+	margin: 0;
+	text-shadow:
+		.04em  .04em  0 #000,
+		-.04em  -.04em  0 #000,  
+		.04em  -.04em  0 #000,
+		-.04em  .04em  0 #000,
+		.04em  .04em  0 #000;
+}
+
+.content h1 {
+	font-size: 4em;
+}
+
+.content h2 {
+	font-size: 3em;
+	margin-bottom: .5em;
+}
+
+.content h3 {
+	font-size: 2em;
+	margin-bottom: .5em;
+}
+
+.content ul {
+
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.content li {
+
+	list-style: none;
+	padding: 0;
+	margin: 0 0 .5em;
 }

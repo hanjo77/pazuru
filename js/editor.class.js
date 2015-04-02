@@ -17,7 +17,12 @@ function Editor(levelNr) {
 
 Editor.prototype.init = function() {
 
-	$('body').html('<div id="playground"><canvas id="game"></canvas></div><div id="menu"></div>');
+	$('body').html('<div id="playground">'
+		+ '<canvas id="game"></canvas>'
+		+ '</div>'
+		+ '<a id="editButton" onclick="pazuru.content.toggleEditMenu()">Menu</a>'
+		+ '<div id="menu"></div>'
+	);
 	this.canvas = document.getElementById('game');
 	this.context = this.canvas.getContext('2d');
 	$(this.canvas).click(function(e) {
@@ -58,6 +63,24 @@ Editor.prototype.init = function() {
 	}
 }
 
+Editor.prototype.toggleEditMenu = function() {
+
+	if ($("#menu").css("display") == "none") {
+
+		$("#menu").css({
+
+			display: "block"
+		});
+	}
+	else {
+
+		$("#menu").css({
+
+			display: "none"
+		});
+	}
+}
+
 Editor.prototype.loadLevel = function(levelNr) {
 
 	config.lastWall = null;
@@ -82,6 +105,16 @@ Editor.prototype.drawMenu = function() {
 	var $menu = $('#menu');
 	$menu.html("");
 	var menuHtml = "";
+
+	$('<a>').attr({
+		id: 'btn_close',
+		class: 'button'
+	}).html(
+		"Close"
+	).click(function(e) {
+		pazuru.content.toggleEditMenu();
+	}).appendTo('#menu');
+
 	var btnCanvas, btnContext;
 	if (this.btns) {
 		for (var i = 0; i < this.btns.length; i++) {
@@ -125,14 +158,9 @@ Editor.prototype.drawMenu = function() {
 
 	$('<a>').attr({
 		id: 'btn_delete',
-		class: 'button' + active,
-		width: (config.blockSize*2),
-		height: (config.blockSize*2)
-	}).css({
-		width: (config.blockSize*2) + 'px',
-		height: (config.blockSize*2) + 'px'
+		class: 'button' + active
 	}).html(
-		"DELETE"
+		"Remove"
 	).click(function(e) {
 		pazuru.content.selectedItem = null;
 		pazuru.content.drawMenu();
@@ -141,14 +169,9 @@ Editor.prototype.drawMenu = function() {
 
 	$('<a>').attr({
 		id: 'btn_delete',
-		class: 'button',
-		width: (config.blockSize*2),
-		height: (config.blockSize*2)
-	}).css({
-		width: (config.blockSize*2) + 'px',
-		height: (config.blockSize*2) + 'px'
+		class: 'button'
 	}).html(
-		"SAVE"
+		"Save"
 	).click(function(e) {
 		pazuru.content.selectedItem = null;
 		pazuru.content.drawMenu();
