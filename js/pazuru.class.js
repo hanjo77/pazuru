@@ -9,6 +9,7 @@ function importScript(url) {
 }
 
 importScript("config.inc.js");
+importScript("util.class.js");
 importScript("reflector.class.js");
 importScript("wall.class.js");
 importScript("line.class.js");
