@@ -119,6 +119,7 @@ Util.initLevel = function(parent, data, cropCanvas) {
 		walls: [],
 		traps: [],
 		stars: [],
+		spirals: [],
 		reflectors: [],
 		bricks: []
 	};
@@ -167,6 +168,14 @@ Util.initLevel = function(parent, data, cropCanvas) {
 
 				tmpObj = data.tiles.stars[i];
 				Util.addStar(parent, tmpObj.row, tmpObj.col);
+			}
+		}
+		if (data.tiles.spirals) {
+
+			for (var i = 0; i < data.tiles.spirals.length; i++) {
+
+				tmpObj = data.tiles.spirals[i];
+				Util.addSpiral(parent, tmpObj.row, tmpObj.col);
 			}
 		}
 		if (data.tiles.reflectors) {
@@ -472,7 +481,7 @@ Util.move = function(parent) {
 		for (var j = parent.tiles.stars.length-1; j >= 0; j--) {
 
 			var star = parent.tiles.stars[j];
-			if (star.collidesWithLine(line) && !line.followUp) {
+			if (star.collidesWithLine(line)) {
 
 				parent.tiles.stars.splice(j, 1);
 				if (parent.tiles.stars.length < 1) {
@@ -483,6 +492,23 @@ Util.move = function(parent) {
 						parent.gameLoop = null;
 					}
 					pazuru.endLevel(parent.levelNr);
+				}
+			}
+		}
+		for (var j = parent.tiles.spirals.length-1; j >= 0; j--) {
+
+			var spiral = parent.tiles.spirals[j];
+			if (spiral.collidesWithLine(line) && line.targetSize != 0) {
+
+				if (line.size == line.targetSize) {
+
+					var newType, newX, newY;
+					var otherIndex = (j%2==0) ? j+1 : j-1;
+					var otherSpiral = parent.tiles.spirals[otherIndex];
+
+					var newLine = Util.addLine(parent, line.type, otherSpiral.startX, otherSpiral.startY, config.speed, config.blockSize);
+					line.followUp = newLine;
+					line.targetSize = 0;
 				}
 			}
 		}
@@ -670,6 +696,9 @@ Util.addTile = function(parent, tile, col, row) {
 		case "Star":
 			Util.addStar(parent, row-config.padding, col-config.padding);
 			break;
+		case "Spiral":
+			Util.addSpiral(parent, row-config.padding, col-config.padding);
+			break;
 		case "Reflector":
 			Util.addReflector(parent, tile.type, row-config.padding, col-config.padding, {
 				rotatable: tile.rotatable,
@@ -700,6 +729,12 @@ Util.addStar = function(parent, row, col) {
 
 	var star = new Star(config.padding+col, config.padding+row);
 	parent.tiles.stars.push(star);
+}
+
+Util.addSpiral = function(parent, row, col) {
+
+	var spiral = new Spiral(config.padding+col, config.padding+row);
+	parent.tiles.spirals.push(spiral);
 }
 
 Util.addWall = function(parent, type, row, col, size) {

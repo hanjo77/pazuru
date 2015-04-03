@@ -14,6 +14,7 @@ importScript("reflector.class.js");
 importScript("wall.class.js");
 importScript("line.class.js");
 importScript("star.class.js");
+importScript("spiral.class.js");
 importScript("trap.class.js");
 importScript("brick.class.js");
 importScript("game.class.js");
