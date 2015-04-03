@@ -35,6 +35,7 @@ Editor.prototype.init = function() {
 		new Wall(1, 1, .5, 1, 1),
 		new Line(1, .5*config.blockSize, config.blockSize, config.blockSize, config.blockSize),
 		new Star(.5, .5),
+		new Spiral(.5, .5),
 		new Reflector(1, .5, .5, {}),
 		new Reflector(1, .5, .5, { rotatable: true }),
 		new Reflector(1, .5, .5, { hideable: true, hidden: false }),
@@ -48,6 +49,7 @@ Editor.prototype.init = function() {
 		walls: [],
 		traps: [],
 		stars: [],
+		spirals: [],
 		reflectors: [],
 		bricks: []
 	};
@@ -257,6 +259,7 @@ Editor.prototype.saveLevel = function() {
 					};
 					break;
 				case "stars":
+				case "spirals":
 				case "bricks":
 					tmpTile = {
 						row: t.row,

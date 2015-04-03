@@ -1,4 +1,4 @@
-function Wall(type, row, col, size) {
+function Wall(type, row, col, size, temporary) {
 
 	if (!col && config.lastWall) {
 
@@ -13,6 +13,7 @@ function Wall(type, row, col, size) {
 	this.col = col;
 	this.row = row;
 	this.size = size;
+	this.temporary = temporary;
 	this.startX = this.col*config.blockSize;
 	this.startY = this.row*config.blockSize;
 	switch(this.type) {
@@ -111,12 +112,33 @@ Wall.prototype.collidesWithLine = function(line) {
 
 	var endX = this.startX+((this.type%2)*this.size*config.blockSize); 
 	var endY = this.startY+(((this.type+1)%2)*this.size*config.blockSize); 
-	return ((
-			(line.startX < this.startX && endX <= line.endX)
-			|| (line.startX > this.startX && endX >= line.endX)
-		) && (
-			(this.startY < line.startY && line.endY <= endY)
-			|| (this.startY > line.startY && line.endY >= endY)
+	var test = (
+		(
+			(this.temporary)
+			&& (
+				(this.startX == line.startX 
+					&& (
+						(this.startY < line.endY && endY > line.endY) 
+						|| (this.startY > line.endY && endY < line.endY)
+					)
+				)
+				|| (this.startY == line.startY 
+					&& (
+						(this.startX < line.endX && endX > line.endX) 
+						|| (this.startX > line.endX && endX < line.endX)
+					)
+				)
+			)
 		)
-		);
+		|| (
+			(
+				(line.startX < this.startX && endX <= line.endX)
+				|| (line.startX > this.startX && endX >= line.endX)
+			) && (
+				(this.startY < line.startY && line.endY <= endY)
+				|| (this.startY > line.startY && line.endY >= endY)
+			)
+		)
+	);
+	return test;
 }

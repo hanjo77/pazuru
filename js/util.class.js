@@ -45,7 +45,7 @@ Util.getItemForPosition = function(event, tiles, deleteItem) {
 				col = Math.floor(clickX/config.blockSize);
 				row = Math.floor(clickY/config.blockSize);
 			}
-			
+
 			if (elem == "walls") {
 
 				var firstIndex = tileItem.getFirst(tileItems);
@@ -210,13 +210,26 @@ Util.addTouchControls = function(parent) {
 				Util.move(config.currentParent);
 			}, 1000/50);
 		}
-		Util.toggleHiddenReflectors(config.currentParent);
-		Util.rotateRight(config.currentParent);
+		else {
+
+			Util.toggleHiddenReflectors(config.currentParent);
+			Util.rotateRight(config.currentParent);
+		}
 	});
 }
 
 Util.startControls = function(parent) {
 
+	$(document).keydown(function(event) {
+
+		// console.log(event.keyCode);
+		switch(event.keyCode) {
+
+			case 18: // alt
+				Util.startSkidmarks(parent);
+				break;
+		}
+	});
 	$(document).keyup(function(event) {
 
 		// console.log(event.keyCode);
@@ -231,6 +244,14 @@ Util.startControls = function(parent) {
 						Util.move(config.currentParent);
 					}, 1000/50);
 				}
+				else {
+
+					Util.toggleHiddenReflectors(parent);
+					Util.rotateRight(parent);
+				}
+				break;
+			case 18: // alt
+				Util.endSkidmarks(parent);
 				break;
 			case 16: // shift
 				Util.toggleHiddenReflectors(parent);
@@ -242,7 +263,7 @@ Util.startControls = function(parent) {
 				Util.rotateRight(parent);
 				break
 		}
-	})
+	});
 }
 
 Util.loadCanvas = function(id, tile) {
@@ -251,6 +272,42 @@ Util.loadCanvas = function(id, tile) {
 	tile.draw(context);
 	return $(canvas);
 };
+
+Util.cleanSkidmarks = function(parent) {
+	
+	for (var i = 0; i < parent.tiles.walls.length; i++) {
+
+		var wall = parent.tiles.walls[i];
+		if (wall.temporary) {
+			parent.tiles.walls.splice(i, (parent.tiles.walls.length-i));
+			break;
+		}
+	}
+}
+
+Util.startSkidmarks = function(parent) {
+	
+	Util.cleanSkidmarks(parent);
+	for (var i = 0; i < parent.tiles.lines.length; i++) {
+
+		var line = parent.tiles.lines[i];
+		if (!line.startedSkidmark) {
+			line.startSkidmark = [line.startX, line.startY];
+			line.startedSkidmark = true;
+		}
+		line.endSkidmark = [line.endX, line.endY];
+	}
+}
+
+Util.endSkidmarks = function(parent) {
+
+	for (var i = 0; i < parent.tiles.lines.length; i++) {
+
+		var line = parent.tiles.lines[i];
+		line.endSkidmark = [line.endX, line.endY];
+		line.startedSkidmark = undefined;
+	}		
+}
 
 Util.updateSize = function(parent, cropCanvas) {
 
@@ -340,7 +397,7 @@ Util.move = function(parent) {
 		for (var j = 0; j < parent.tiles.reflectors.length; j++) {
 
 			var reflector = parent.tiles.reflectors[j];
-			if (reflector.collidesWithLine(line) && !line.followUp) {
+			if (reflector.collidesWithLine(line) && line.lastCollision != reflector) {
 
 				var newType;
 				var newX;
@@ -436,45 +493,57 @@ Util.move = function(parent) {
 
 					var newLine = Util.addLine(parent, newType, newX, newY, 0, config.blockSize);
 					line.followUp = newLine;
+					line.lastCollision = reflector;
 					line.targetSize = 0;
 
 				}
 			}
 		}		
-		for (var j = 0; j < parent.tiles.walls.length; j++) {
+		for (var j = parent.tiles.walls.length-1; j >= 0; j--) {
 
 			var wall = parent.tiles.walls[j];
-			if (wall.collidesWithLine(line) && !line.followUp && line.targetSize != 0) {
+			if (wall.collidesWithLine(line) && line.lastCollision != wall) {
 
 				if (line.size == line.targetSize) {
 
-					var newType, newX, newY;
+					var newType, newX, newY, size;
 					switch(line.type) {
 
 						case 1:
 							newType = 3;
-							newX = line.endX-config.speed;
+							newX = wall.startX;
 							newY = line.startY;
+							size = wall.startX-line.startX;
 							break;
 						case 2:
 							newType = 4;
 							newX = line.startX;
-							newY = line.endY-config.speed;
+							newY = wall.startY;
+							size = wall.startY-line.startY;
 							break;
 						case 3:
 							newType = 1;
-							newX = line.endX+config.speed;
+							newX = wall.startX;
 							newY = line.startY;
+							size = line.startX-wall.startX;
 							break;
 						case 4:
 							newType = 2;
 							newX = line.startX;
-							newY = line.endY+config.speed;
+							newY = wall.startY;
+							size = line.startY-wall.startY;
 							break;
 					}
+					if (wall.temporary) {
+
+						Util.cleanSkidmarks(parent);
+					}
+
 					var newLine = Util.addLine(parent, newType, newX, newY, config.speed, config.blockSize);
 					line.followUp = newLine;
+					line.lastCollision = wall
 					line.targetSize = 0;
+					line.size = size;
 				}
 			}
 		}
@@ -498,7 +567,7 @@ Util.move = function(parent) {
 		for (var j = parent.tiles.spirals.length-1; j >= 0; j--) {
 
 			var spiral = parent.tiles.spirals[j];
-			if (spiral.collidesWithLine(line) && line.targetSize != 0) {
+			if (spiral.collidesWithLine(line) && line.lastCollision != spiral) {
 
 				if (line.size == line.targetSize) {
 
@@ -508,6 +577,7 @@ Util.move = function(parent) {
 
 					var newLine = Util.addLine(parent, line.type, otherSpiral.startX, otherSpiral.startY, config.speed, config.blockSize);
 					line.followUp = newLine;
+					line.lastCollision = spiral;
 					line.targetSize = 0;
 				}
 			}
@@ -515,7 +585,7 @@ Util.move = function(parent) {
 		for (var j = parent.tiles.bricks.length-1; j >= 0; j--) {
 
 			var brick = parent.tiles.bricks[j];
-			if (brick.collidesWithLine(line) && !line.followUp) {
+			if (brick.collidesWithLine(line) && line.lastCollision != brick) {
 
 				parent.tiles.bricks.splice(j, 1);
 				if (line.size == line.targetSize) {
@@ -546,6 +616,7 @@ Util.move = function(parent) {
 					}
 					var newLine = Util.addLine(parent, newType, newX, newY, config.speed, config.blockSize);
 					line.followUp = newLine;
+					line.lastCollision = brick
 					line.targetSize = 0;
 				}
 			}
@@ -737,10 +808,11 @@ Util.addSpiral = function(parent, row, col) {
 	parent.tiles.spirals.push(spiral);
 }
 
-Util.addWall = function(parent, type, row, col, size) {
+Util.addWall = function(parent, type, row, col, size, temporary) {
 
-	var wall = new Wall(type, config.padding+row, config.padding+col, size);
+	var wall = new Wall(type, config.padding+row, config.padding+col, size, temporary);
 	parent.tiles.walls.push(wall);
+	return wall;
 }
 
 Util.addReflector = function(parent, type, row, col, options) {

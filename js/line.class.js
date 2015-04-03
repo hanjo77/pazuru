@@ -98,6 +98,44 @@ Line.prototype.draw = function(context) {
 			context.stroke();				
 		}
 	}
+
+	if (this.startSkidmark && this.endSkidmark) {
+
+		var dist = [this.endSkidmark[0]-this.startSkidmark[0], this.endSkidmark[1]-this.startSkidmark[1]];
+		var type;
+		if (dist[0] > 0) {
+
+			type = 1;
+		} 
+		else if (dist[0] < 0) {
+
+			type = 3;
+		}
+		else if (dist[1] > 0) {
+
+			type = 2;
+		} 
+		else if (dist[1] < 0) {
+
+			type = 4;
+		}
+
+		dist = dist[(type+1)%2]/config.blockSize;
+
+		if (!this.skidmark) {
+
+			this.skidmark = Util.addWall(pazuru.content,
+				type, 
+				(this.startSkidmark[1]/config.blockSize)-config.padding, 
+				(this.startSkidmark[0]/config.blockSize)-config.padding, 
+				dist,
+				true);
+		}
+		else {
+
+			this.skidmark.dist = dist;
+		}
+	}
 }
 
 Line.prototype.move = function() {
