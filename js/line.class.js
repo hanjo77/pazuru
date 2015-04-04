@@ -101,24 +101,19 @@ Line.prototype.draw = function(context) {
 
 	if (this.startSkidmark && this.endSkidmark) {
 
-		var dist = [this.endSkidmark[0]-this.startSkidmark[0], this.endSkidmark[1]-this.startSkidmark[1]];
+		var dist = [
+			Math.ceil(this.endSkidmark[0]-this.startSkidmark[0]), 
+			Math.ceil(this.endSkidmark[1]-this.startSkidmark[1])
+		];
 		var type;
-		if (dist[0] > 0) {
+		if (dist[0] != 0) {
 
 			type = 1;
-		} 
-		else if (dist[0] < 0) {
-
-			type = 3;
 		}
-		else if (dist[1] > 0) {
+		else if (dist[1] != 0) {
 
 			type = 2;
 		} 
-		else if (dist[1] < 0) {
-
-			type = 4;
-		}
 
 		dist = dist[(type+1)%2]/config.blockSize;
 
@@ -133,7 +128,7 @@ Line.prototype.draw = function(context) {
 		}
 		else {
 
-			this.skidmark.dist = dist;
+			this.skidmark.size = dist;
 		}
 	}
 }

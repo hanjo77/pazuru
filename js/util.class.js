@@ -225,7 +225,7 @@ Util.startControls = function(parent) {
 		// console.log(event.keyCode);
 		switch(event.keyCode) {
 
-			case 18: // alt
+			case 189: // -
 				Util.startSkidmarks(parent);
 				break;
 		}
@@ -250,7 +250,7 @@ Util.startControls = function(parent) {
 					Util.rotateRight(parent);
 				}
 				break;
-			case 18: // alt
+			case 189: // -
 				Util.endSkidmarks(parent);
 				break;
 			case 16: // shift
@@ -287,11 +287,11 @@ Util.cleanSkidmarks = function(parent) {
 
 Util.startSkidmarks = function(parent) {
 	
-	Util.cleanSkidmarks(parent);
 	for (var i = 0; i < parent.tiles.lines.length; i++) {
 
 		var line = parent.tiles.lines[i];
 		if (!line.startedSkidmark) {
+			Util.cleanSkidmarks(parent);
 			line.startSkidmark = [line.startX, line.startY];
 			line.startedSkidmark = true;
 		}
@@ -502,11 +502,12 @@ Util.move = function(parent) {
 		for (var j = parent.tiles.walls.length-1; j >= 0; j--) {
 
 			var wall = parent.tiles.walls[j];
-			if (wall.collidesWithLine(line) && line.lastCollision != wall) {
+			if (wall && wall.collidesWithLine(line) && line.lastCollision != wall) {
 
 				if (line.size == line.targetSize) {
 
 					var newType, newX, newY, size;
+					var doReflect = true;
 					switch(line.type) {
 
 						case 1:
@@ -536,14 +537,22 @@ Util.move = function(parent) {
 					}
 					if (wall.temporary) {
 
+						if (wall.type%2 == line.type%2) {
+
+
+							doReflect = false;
+						}
 						Util.cleanSkidmarks(parent);
 					}
 
-					var newLine = Util.addLine(parent, newType, newX, newY, config.speed, config.blockSize);
-					line.followUp = newLine;
-					line.lastCollision = wall
-					line.targetSize = 0;
-					line.size = size;
+					if (doReflect) {
+
+						var newLine = Util.addLine(parent, newType, newX, newY, config.speed, config.blockSize);
+						line.followUp = newLine;
+						line.lastCollision = wall
+						line.targetSize = 0;
+						line.size = size;
+					}
 				}
 			}
 		}
