@@ -13,10 +13,10 @@ Trap.prototype.draw = function(context) {
 	var gap = config.blockSize/4;
 	switch(this.type) {
 		case 1:
-			startX1 = this.startX+((config.blockSize-gap)/2);
+			startX1 = this.startX+((config.blockSize-gap)*.5);
 			endX1 = startX1;
-			startY1 = this.startY-(config.blockSize/2);
-			endY1 = this.startY+(config.blockSize/2);
+			startY1 = this.startY-(config.blockSize*.3);
+			endY1 = this.startY+(config.blockSize*.3);
 
 			startX2 = startX1+gap;
 			endX2 = endX1+gap;
@@ -24,9 +24,9 @@ Trap.prototype.draw = function(context) {
 			endY2 = endY1;
 			break;
 		case 2:
-			startX1 = this.startX-(config.blockSize/2);
-			endX1 = this.startX+(config.blockSize/2);
-			startY1 = this.startY+((config.blockSize-gap)/2);
+			startX1 = this.startX-(config.blockSize*.3);
+			endX1 = this.startX+(config.blockSize*.3);
+			startY1 = this.startY+((config.blockSize-gap)*.5);
 			endY1 = startY1;
 
 			startX2 = startX1;

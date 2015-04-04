@@ -25,45 +25,46 @@ Reflector.prototype.draw = function(context) {
 	context.fillStyle = '#ffffff';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
+	var padding = config.blockSize/5;
 	switch(this.type) {
 
 		case 1:
-			context.moveTo(this.startX, this.startY);
-			context.lineTo(this.startX, this.startY+config.blockSize);
-			context.lineTo(this.startX+config.blockSize, this.startY);
+			context.moveTo(this.startX+padding, this.startY+padding);
+			context.lineTo(this.startX+padding, this.startY+config.blockSize-padding);
+			context.lineTo(this.startX+config.blockSize-padding, this.startY+padding);
 			if (this.hideable) {
 
-				dot = [this.startX+(config.blockSize*.3), this.startY+(config.blockSize*.3)]
+				dot = [this.startX+(config.blockSize*.35), this.startY+(config.blockSize*.35)]
 			}
 			break;
 
 		case 2:
-			context.moveTo(this.startX, this.startY);
-			context.lineTo(this.startX, this.startY+config.blockSize);
-			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
+			context.moveTo(this.startX+padding, this.startY+padding);
+			context.lineTo(this.startX+padding, this.startY+config.blockSize-padding);
+			context.lineTo(this.startX+config.blockSize-padding, this.startY+config.blockSize-padding);
 			if (this.hideable) {
 
-				dot = [this.startX+(config.blockSize*.3), this.startY+(config.blockSize*.7)]
+				dot = [this.startX+(config.blockSize*.35), this.startY+(config.blockSize*.55)]
 			}
 			break;
 
 		case 3:
-			context.moveTo(this.startX, this.startY+config.blockSize);
-			context.lineTo(this.startX+config.blockSize, this.startY+config.blockSize);
-			context.lineTo(this.startX+config.blockSize, this.startY);
+			context.moveTo(this.startX+padding, this.startY+config.blockSize-padding);
+			context.lineTo(this.startX+config.blockSize-padding, this.startY+config.blockSize-padding);
+			context.lineTo(this.startX+config.blockSize-padding, this.startY+padding);
 			if (this.hideable) {
 
-				dot = [this.startX+(config.blockSize*.7), this.startY+(config.blockSize*.7)]
+				dot = [this.startX+(config.blockSize*.55), this.startY+(config.blockSize*.55)]
 			}
 			break;
 
 		case 4:
-			context.moveTo(this.startX+config.blockSize, this.startY+config.blockSize);
-			context.lineTo(this.startX+config.blockSize, this.startY);
-			context.lineTo(this.startX, this.startY);
+			context.moveTo(this.startX+config.blockSize-padding, this.startY+config.blockSize-padding);
+			context.lineTo(this.startX+config.blockSize-padding, this.startY+padding);
+			context.lineTo(this.startX+padding, this.startY+padding);
 			if (this.hideable) {
 
-				dot = [this.startX+(config.blockSize*.7), this.startY+(config.blockSize*.3)]
+				dot = [this.startX+(config.blockSize*.55), this.startY+(config.blockSize*.35)]
 			}
 			break;
 	}
@@ -74,7 +75,7 @@ Reflector.prototype.draw = function(context) {
 
 		context.fillStyle = context.strokeStyle;
 		context.moveTo(this.startX+config.blockSize, this.startY+config.blockSize);
-		context.fillRect(dot[0]-config.lineWidth, dot[1]-config.lineWidth, config.lineWidth*2, config.lineWidth*2);
+		context.fillRect(dot[0], dot[1], config.lineWidth, config.lineWidth);
 	}
 }
 

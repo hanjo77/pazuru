@@ -8,18 +8,20 @@ function Star(col, row) {
 
 Star.prototype.draw = function(context) {
 
+	var outerPoint = config.blockSize*.3;
+	var innerPoint = config.blockSize*.1;
 	context.strokeStyle = '#ffcc00';
 	context.fillStyle = '#ffff00';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();
-	context.moveTo(this.startX, this.startY-(config.blockSize*.5));
-	context.lineTo(this.startX+(config.blockSize*.2), this.startY-(config.blockSize*.2));
-	context.lineTo(this.startX+(config.blockSize*.5), this.startY);
-	context.lineTo(this.startX+(config.blockSize*.2), this.startY+(config.blockSize*.2));
-	context.lineTo(this.startX, this.startY+(config.blockSize*.5));
-	context.lineTo(this.startX-(config.blockSize*.2), this.startY+(config.blockSize*.2));
-	context.lineTo(this.startX-(config.blockSize*.5), this.startY);
-	context.lineTo(this.startX-(config.blockSize*.2), this.startY-(config.blockSize*.2));
+	context.moveTo(this.startX, this.startY-outerPoint);
+	context.lineTo(this.startX+innerPoint, this.startY-innerPoint);
+	context.lineTo(this.startX+outerPoint, this.startY);
+	context.lineTo(this.startX+innerPoint, this.startY+innerPoint);
+	context.lineTo(this.startX, this.startY+outerPoint);
+	context.lineTo(this.startX-innerPoint, this.startY+innerPoint);
+	context.lineTo(this.startX-outerPoint, this.startY);
+	context.lineTo(this.startX-innerPoint, this.startY-innerPoint);
 	context.closePath();
 	// context.fill();
 	context.stroke();

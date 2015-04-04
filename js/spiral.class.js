@@ -15,7 +15,8 @@ Spiral.prototype.draw = function(context) {
 	context.moveTo(this.startX, this.startY);
 	var tmpX = 0;
 	var tmpY = this.startY-(config.blockSize*.5);
-	while (Math.abs(tmpX) < config.blockSize/2) {
+	var padding = config.blockSize/5;
+	while (Math.abs(tmpX) <= (config.blockSize/2)-padding) {
 
 		var lastX = tmpX;
 		currentX = tmpX > 0 ? -1 : 1;

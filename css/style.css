@@ -20,12 +20,17 @@ html, body {
 	right: 2em;
 	top: 2em;
 	display: block;
-	width: 18em;
+	width: 18.5em;
 	float: right;
 	border: 5px solid #000000;
 	background-color: #ffffff;
 	position: absolute;
 	display: none;
+}
+
+#menuButtons {
+
+	padding: 0 .5em .2em;
 }
 
 #menu canvas {

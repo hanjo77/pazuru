@@ -205,6 +205,7 @@ Util.addTouchControls = function(parent) {
 
 		if (!config.currentParent.gameLoop) {
 
+			event.preventDefault();
 			config.currentParent.gameLoop = window.setInterval(function() {
 				
 				Util.move(config.currentParent);
@@ -382,6 +383,7 @@ Util.rotateRight = function(parent) {
 
 Util.move = function(parent) {
 
+	var lineCanMove = true;
 	for (var i = parent.tiles.lines.length-1; i >= 0; i--) {
 
 		var line = parent.tiles.lines[i];
@@ -504,49 +506,53 @@ Util.move = function(parent) {
 			var wall = parent.tiles.walls[j];
 			if (wall && wall.collidesWithLine(line) && line.lastCollision != wall) {
 
-				if (line.size == line.targetSize) {
+				if (line.size <= line.targetSize) {
 
 					var newType, newX, newY, size;
 					var doReflect = true;
-					switch(line.type) {
+					if (wall.type%2 != line.type%2) {
 
-						case 1:
-							newType = 3;
-							newX = wall.startX;
-							newY = line.startY;
-							size = wall.startX-line.startX;
-							break;
-						case 2:
-							newType = 4;
-							newX = line.startX;
-							newY = wall.startY;
-							size = wall.startY-line.startY;
-							break;
-						case 3:
-							newType = 1;
-							newX = wall.startX;
-							newY = line.startY;
-							size = line.startX-wall.startX;
-							break;
-						case 4:
-							newType = 2;
-							newX = line.startX;
-							newY = wall.startY;
-							size = line.startY-wall.startY;
-							break;
-					}
-					if (wall.temporary) {
+						line.size -= 2*config.speed;
+						switch(line.type) {
 
-						if (wall.type%2 == line.type%2) {
-
-
-							doReflect = false;
+							case 1:
+								newType = 3;
+								newX = wall.startX;
+								newY = line.startY;
+								size = wall.startX-line.startX;
+								break;
+							case 2:
+								newType = 4;
+								newX = line.startX;
+								newY = wall.startY;
+								size = wall.startY-line.startY;
+								break;
+							case 3:
+								newType = 1;
+								newX = wall.startX;
+								newY = line.startY;
+								size = line.startX-wall.startX;
+								break;
+							case 4:
+								newType = 2;
+								newX = line.startX;
+								newY = wall.startY;
+								size = line.startY-wall.startY;
+								break;
 						}
+					}
+					else if (wall.temporary) {
+
+						doReflect = false;
+					}
+					else {
+
 						Util.cleanSkidmarks(parent);
 					}
 
 					if (doReflect) {
 
+						lineCanMove = false;
 						var newLine = Util.addLine(parent, newType, newX, newY, config.speed, config.blockSize);
 						line.followUp = newLine;
 						line.lastCollision = wall
@@ -630,7 +636,10 @@ Util.move = function(parent) {
 				}
 			}
 		}
-		line.move();
+		if (lineCanMove) {
+
+			line.move();
+		}
 		if (line.size <= 0) {
 
 			if (parent.tiles.lines.length > 1) {

@@ -118,6 +118,10 @@ Editor.prototype.drawMenu = function() {
 		pazuru.content.toggleEditMenu();
 	}).appendTo('#menu');
 
+	$('<div>').attr({
+		id: 'menuButtons'
+	}).appendTo('#menu');
+
 	var btnCanvas, btnContext;
 	if (this.btns) {
 		for (var i = 0; i < this.btns.length; i++) {
@@ -132,7 +136,7 @@ Editor.prototype.drawMenu = function() {
 			}).css({
 				width: (config.blockSize*2) + 'px',
 				height: (config.blockSize*2) + 'px'
-			}).appendTo('#menu');
+			}).appendTo('#menuButtons');
 
 			var canvas = document.getElementById('btn_' + i);
 			var context = canvas.getContext("2d");
