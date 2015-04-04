@@ -1,14 +1,15 @@
-function Spiral(col, row) {
+function Spiral(col, row, color) {
 
 	this.col = col;
 	this.row = row;
+	this.color = color;
 	this.startX = (this.col+.5)*config.blockSize;
 	this.startY = (this.row+.5)*config.blockSize;
 }
 
 Spiral.prototype.draw = function(context) {
 
-	context.strokeStyle = '#0000ff';
+	context.strokeStyle = this.color > 0 ? config.spiralColors[this.color] : config.spiralColors[0];
 	context.fillStyle = '#ffffff';
 	context.lineWidth = config.lineWidth;
 	context.beginPath();

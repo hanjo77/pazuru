@@ -175,7 +175,7 @@ Util.initLevel = function(parent, data, cropCanvas) {
 			for (var i = 0; i < data.tiles.spirals.length; i++) {
 
 				tmpObj = data.tiles.spirals[i];
-				Util.addSpiral(parent, tmpObj.row, tmpObj.col);
+				Util.addSpiral(parent, tmpObj.row, tmpObj.col, tmpObj.color);
 			}
 		}
 		if (data.tiles.reflectors) {
@@ -786,7 +786,7 @@ Util.addTile = function(parent, tile, col, row) {
 			Util.addStar(parent, row-config.padding, col-config.padding);
 			break;
 		case "Spiral":
-			Util.addSpiral(parent, row-config.padding, col-config.padding);
+			Util.addSpiral(parent, row-config.padding, col-config.padding, tile.color);
 			break;
 		case "Reflector":
 			Util.addReflector(parent, tile.type, row-config.padding, col-config.padding, {
@@ -820,9 +820,9 @@ Util.addStar = function(parent, row, col) {
 	parent.tiles.stars.push(star);
 }
 
-Util.addSpiral = function(parent, row, col) {
+Util.addSpiral = function(parent, row, col, color) {
 
-	var spiral = new Spiral(config.padding+col, config.padding+row);
+	var spiral = new Spiral(config.padding+col, config.padding+row, color);
 	parent.tiles.spirals.push(spiral);
 }
 

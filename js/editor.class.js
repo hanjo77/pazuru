@@ -35,7 +35,7 @@ Editor.prototype.init = function() {
 		new Wall(1, 1, .5, 1, 1),
 		new Line(1, .5*config.blockSize, config.blockSize, config.blockSize, config.blockSize),
 		new Star(.5, .5),
-		new Spiral(.5, .5),
+		new Spiral(.5, .5, 0),
 		new Reflector(1, .5, .5, {}),
 		new Reflector(1, .5, .5, { rotatable: true }),
 		new Reflector(1, .5, .5, { hideable: true, hidden: false }),
@@ -263,11 +263,17 @@ Editor.prototype.saveLevel = function() {
 					};
 					break;
 				case "stars":
-				case "spirals":
 				case "bricks":
 					tmpTile = {
 						row: t.row,
 						col: t.col
+					};
+					break;
+				case "spirals":
+					tmpTile = {
+						row: t.row,
+						col: t.col,
+						color: t.color
 					};
 					break;
 			}
@@ -276,7 +282,7 @@ Editor.prototype.saveLevel = function() {
 		}
 	}
 	obj.tiles = tiles;
-	console.log(JSON.stringify(obj));
+	$.post( "save_level.php", { data: JSON.stringify(obj) } );
 }
 
 Editor.prototype.placeTile = function(event) {
@@ -386,6 +392,10 @@ Editor.prototype.clickTile = function($tile) {
 	$tile.addClass('active');
 	var id = parseInt($tile.attr('id').replace('btn_', ''), 10);
 	var selectedItem = this.btns[id];
+	if (selectedItem && selectedItem.constructor.name == "Spiral") {
+
+		selectedItem.color = (selectedItem.color+1)%config.spiralColors.length;
+	}
 	if (selectedItem.type && selectedItem.constructor.name != "Wall") {
 
 		selectedItem.type++;
