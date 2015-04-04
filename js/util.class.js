@@ -545,7 +545,8 @@ Util.move = function(parent) {
 
 						doReflect = false;
 					}
-					else {
+
+					if (wall.temporary) {
 
 						Util.cleanSkidmarks(parent);
 					}
